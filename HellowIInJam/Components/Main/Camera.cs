@@ -21,5 +21,12 @@ namespace CastleSim.Components
         public bool ZoomChanged;
         public float MaxZoomOut;
         public float ZoomSteps;
+
+        //each update:
+        public Point Offset;
+        public int ColumnsToDraw;
+        public int RowsToDraw;
+
+
     }
 }

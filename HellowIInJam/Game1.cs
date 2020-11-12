@@ -1,8 +1,10 @@
 ﻿using CastleSim.Components;
+using CastleSim.Systems;
 using CastleSim.Systems.HelperClasses;
 using CastleSim.Systems.Update;
 using DefaultEcs;
 using DefaultEcs.System;
+using HellowIInJam.Components.Main;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,12 +16,19 @@ namespace HellowIInJam
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Entity _camera;
         private World _world;
+
+        #region Entitys
+
+        private Entity _camera;
+        private Entity _gameConfig;
+
+        #endregion
 
         #region Systems
 
         SequentialSystem<float> mainSystems;
+        SequentialSystem<float> drawSystems;
 
         #endregion
 
@@ -58,21 +67,41 @@ namespace HellowIInJam
             _world = new World();
 
             dummy = Content.Load<Texture2D>("dummy");
-            mainSystems = new SequentialSystem<float>(new CameraSystem(_world));
+            
 
             InitEntitys();
             InitStaticClasses();
+            
+
 
             base.Initialize();
         }
 
+        private void InitSystems()
+        {
+            mainSystems = new SequentialSystem<float>(new CameraSystem(_world),new MapSystem(_world));
+            drawSystems = new SequentialSystem<float>(new DrawMapSystem(_spriteBatch, _world,Content));
+        }
+
         private void InitStaticClasses()
         {
+            
             CameraHelper.Init(_world);
+            PosTransformer.Init(_world);
+           
+            //MapHelper.Init(_world);
         }
 
         private void InitEntitys()
         {
+            #region GameConfig
+
+            _gameConfig = _world.CreateEntity();
+            _gameConfig.Set(new GameConfig(
+                TileSize:new Point(16, 16)
+                ));
+            #endregion
+
             #region Camera
 
             _camera = _world.CreateEntity();
@@ -82,7 +111,7 @@ namespace HellowIInJam
                 ZoomSteps = 0.2f,
                 Zoom = 1f,
                 Bounds = _graphics.GraphicsDevice.Viewport.Bounds,
-                CameraPosition = new Vector2(0, 0),
+                CameraPosition = new Vector2(200, 200),
                 CameraSpeed = 1f,
                 ZoomChanged = true,
                 Changed = true
@@ -90,13 +119,17 @@ namespace HellowIInJam
 
             #endregion
 
+            MapHelper.LoadMap("Dummy",_world);
+
+
+
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            InitSystems();
 
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -113,12 +146,9 @@ namespace HellowIInJam
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            drawSystems.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, transformMatrix: _camera.Get<Camera>().Transform);
 
-            _spriteBatch.Draw(dummy, new Vector2(20, 20), Color.White);
-
-            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -7,14 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
+using HellowIInJam.Components.Main;
 
 namespace CastleSim.Systems.HelperClasses
 {
     internal static class CameraHelper
     {
+        private static Entity _gameConfig;
         private static Entity _camera;
         internal static void Init(World world)
         {
+            _gameConfig = world.GetEntities().With<GameConfig>().AsSet().GetEntities()[0];
             _camera = world.GetEntities().With<Camera>().AsSet().GetEntities()[0];
         }
 
@@ -59,19 +62,18 @@ namespace CastleSim.Systems.HelperClasses
                 MathHelper.Max(tl.X, MathHelper.Max(tr.X, MathHelper.Max(bl.X, br.X))),
                 MathHelper.Max(tl.Y, MathHelper.Max(tr.Y, MathHelper.Max(bl.Y, br.Y))));
             component.VisibleArea = new Rectangle((int)min.X, (int)min.Y, (int)Math.Round(max.X - min.X, 0), (int)Math.Round(max.Y - min.Y, 0));
-            //component.Offset = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y));
-            //component.Offset.X += 0;
-            //component.Offset.Y -= 3;
-            //if (component.ZoomChanged)
-            //{
-            //    var TopLef = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X, component.VisibleArea.Y));
-            //    var TopRig = component.Offset;
-            //    var BottomRig = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y + component.VisibleArea.Height));
-            //    ref var gameConfig = ref _gameConfig.Get<GameConfig>();
-            //    component.ColumnsToDraw = BottomRig.X - TopRig.X + 8;
-            //    component.RowsToDraw = (TopRig.X - TopLef.X + 4) * 2;
-            //    component.ZoomChanged = false;
-            //}
+            component.Offset = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y));
+            if (component.ZoomChanged)
+            {
+                var TopLef = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X, component.VisibleArea.Y));
+                var TopRig = component.Offset;
+                var BottomRig = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y + component.VisibleArea.Height));
+                ref var gameConfig = ref _gameConfig.Get<GameConfig>();
+                component.ColumnsToDraw = BottomRig.X - TopRig.X;
+                component.ColumnsToDraw = 30;
+                component.RowsToDraw = TopRig.X - TopLef.X;
+                component.ZoomChanged = false;
+            }
 
         }
 
