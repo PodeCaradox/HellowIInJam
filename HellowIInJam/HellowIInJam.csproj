@@ -24,7 +24,14 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DefaultEcs" Version="0.14.4" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="Myra" Version="1.0.2.211" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\Main\" />
+    <Folder Include="Helper\Main\" />
+    <Folder Include="Systems\Main\" />
   </ItemGroup>
 </Project>
