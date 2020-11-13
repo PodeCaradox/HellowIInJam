@@ -1,9 +1,9 @@
 ﻿using DefaultEcs;
-using CastleSim.Components;
 using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using HellowIInJam.Components.Map;
 using HellowIInJam.Components.Main;
+using HellowIInJam.Main.Components;
 
 namespace CastleSim.Systems.HelperClasses
 {

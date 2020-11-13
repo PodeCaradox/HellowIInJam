@@ -9,6 +9,8 @@ namespace HellowIInJam.Components.Main
     {
         public Point TileSize; 
         public Point TileSizeHalf;
+
+
         public GameConfig(Point TileSize)
         {
             this.TileSize = TileSize;

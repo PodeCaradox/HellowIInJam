@@ -10,6 +10,7 @@ using HellowIInJam.Components.Main;
 using CastleSim.Json;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using HellowIInJam.Components.Shared;
 
 namespace CastleSim.Systems.HelperClasses
 {
@@ -26,7 +27,7 @@ namespace CastleSim.Systems.HelperClasses
             rnd = new Random();
            
         }
-        internal static void LoadMap(string mapName,World world)
+        internal static void LoadMap(string mapName,World world,ContentManager Content)
         {
 
             ref var gameConfig = ref world.GetEntities().With<GameConfig>().AsSet().GetEntities()[0].Get<GameConfig>();
@@ -36,18 +37,34 @@ namespace CastleSim.Systems.HelperClasses
             var mapData = JsonConvert.DeserializeObject<MapData>(file);
             _map = world.CreateEntity();
 
+            var mapTexture = Content.Load<Texture2D>("dummy");
 
             Entity[] tiles = new Entity[mapData.MapTiles.Length];
-            for (int i = 0; i < mapData.MapTiles.Length; i++)
+            var dummy = world.CreateEntity();
+            dummy.Set(new TextureShared()
             {
-                tiles[i] = world.CreateEntity();
-                tiles[i].Set(new MapTile()
-                {
-                    Position = new Vector2(i % mapData.Size.X * gameConfig.TileSize.X, i / mapData.Size.Y * gameConfig.TileSize.Y),
-                    TileID = mapData.MapTiles[i]
-                });
+                TextureSheet = mapTexture,
+            });
 
+            for (int y = 0; y < mapData.Size.Y; y++)
+            {
+                for (int x = 0; x < mapData.Size.X; x++)
+                {
+                    int i = x + y * mapData.Size.X;
+                    tiles[i] = world.CreateEntity();
+                    tiles[i].Set(new MapTile()
+                    {
+                        Position = new Vector2(x * gameConfig.TileSize.X, y * gameConfig.TileSize.Y),
+                        TileID = mapData.MapTiles[i]
+                    });
+                    tiles[i].SetSameAs<TextureShared>(dummy);
+                }
             }
+
+
+          
+
+            dummy.Dispose();
 
 
 
@@ -65,13 +82,15 @@ namespace CastleSim.Systems.HelperClasses
             MapData map = new MapData();
             map.Name = mapName;
 
-            map.Size = new Point(100,100);
+            map.Size = new Point(150,1000);
             map.MapTiles = new int[map.Size.X * map.Size.Y];
+
+            Random r = new Random();
             for (int y = 0; y < map.Size.Y; y++)
             {
                 for (int x = 0; x < map.Size.X; x++)
                 {
-                    map.MapTiles[x + y * map.Size.X] = 0;
+                    map.MapTiles[x + y * map.Size.X] = r.Next(3);
                 }
             }
 

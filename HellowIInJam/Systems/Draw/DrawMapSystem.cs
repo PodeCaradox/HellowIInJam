@@ -1,10 +1,11 @@
 ﻿using DefaultEcs;
 using DefaultEcs.System;
-using CastleSim.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using HellowIInJam.Components.Map;
 using Microsoft.Xna.Framework.Content;
+using HellowIInJam.Main.Components;
+using HellowIInJam.Components.Shared;
 
 namespace CastleSim.Systems
 {
@@ -15,16 +16,15 @@ namespace CastleSim.Systems
         private readonly SpriteBatch _batch;
         private readonly World _world;
         private readonly Entity _camera;
-        private readonly Texture2D dummy;
         public static SamplerState SS_PointBorder = new SamplerState() { Filter = TextureFilter.Point, AddressU = TextureAddressMode.Border, AddressV = TextureAddressMode.Border };
-        internal DrawMapSystem(SpriteBatch batch, World world, ContentManager Content)
+        internal DrawMapSystem(SpriteBatch batch, World world)
              : base(world)
         {
             _batch = batch;
             _world = world;
             _camera = _world.GetEntities().With<Camera>().AsSet().GetEntities()[0];
 
-            dummy = Content.Load<Texture2D>("dummy");
+           
 
         }
 
@@ -34,10 +34,11 @@ namespace CastleSim.Systems
 
             _batch.Begin(SpriteSortMode.Deferred,samplerState: SS_PointBorder, transformMatrix: _camera.Get<Camera>().Transform);
 
-            for (int i = 0; i < map.Tiles.Length; i++)
+            for (int i = 0; i < map.TilesToDraw; i++)
             {
-                ref var tile = ref map.Tiles[i].Get<MapTile>();
-                _batch.Draw(dummy, tile.Position, new Rectangle(tile.TileID * 16, 0, 16, 16), Color.White);
+                ref var tile = ref map.ToDraw[i].Get<MapTile>();
+                ref var texture = ref map.ToDraw[i].Get<TextureShared>();
+                _batch.Draw(texture.TextureSheet, tile.Position, new Rectangle(tile.TileID * 16, 0, 16, 16), Color.White);
             }
             
 

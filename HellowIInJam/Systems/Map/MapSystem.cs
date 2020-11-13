@@ -1,23 +1,8 @@
 ﻿using DefaultEcs;
 using DefaultEcs.System;
-using CastleSim.Components;
-using CastleSim.Json;
-using CastleSim.Systems.HelperClasses;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-//using Myra.Graphics2D.TextureAtlases;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HellowIInJam.Components.Map;
 using HellowIInJam.Components.Main;
+using HellowIInJam.Main.Components;
 
 namespace CastleSim.Systems.Update
 {
@@ -60,11 +45,11 @@ namespace CastleSim.Systems.Update
             for (int y = 0; y < cameraData.RowsToDraw; y++)
             {
                 int yIndex = (cameraData.Offset.Y + y);
-                if (yIndex >= map.Size.Y || yIndex < 0) break;
+                if (yIndex >= map.Size.Y || yIndex < 0) continue;
                 for (int x = 0; x < cameraData.ColumnsToDraw; x++)
                 {
-                    int xOffset = cameraData.Offset.X + x;
-                    if (xOffset >= map.Size.X || xOffset < 0) break;
+                    int xOffset = cameraData.Offset.X - x;
+                    if (xOffset >= map.Size.X || xOffset < 0) continue;
 
                     if (map.ToDraw.Count <= counter)
                     {

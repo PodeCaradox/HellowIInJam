@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30406.217
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HellowIInJam", "HellowIInJam\HellowIInJam.csproj", "{6FDE9BC8-52F9-48A7-BC68-FA1DAB4B65BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HellowIInJam", "HellowIInJam\HellowIInJam.csproj", "{6FDE9BC8-52F9-48A7-BC68-FA1DAB4B65BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAudio", "..\NAudio-1.10.0\NAudio\NAudio.csproj", "{7677ADEB-21C0-4AC5-AD5A-A0F407079788}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6FDE9BC8-52F9-48A7-BC68-FA1DAB4B65BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FDE9BC8-52F9-48A7-BC68-FA1DAB4B65BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FDE9BC8-52F9-48A7-BC68-FA1DAB4B65BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7677ADEB-21C0-4AC5-AD5A-A0F407079788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7677ADEB-21C0-4AC5-AD5A-A0F407079788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7677ADEB-21C0-4AC5-AD5A-A0F407079788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7677ADEB-21C0-4AC5-AD5A-A0F407079788}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

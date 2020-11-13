@@ -3,7 +3,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PublishReadyToRun>false</PublishReadyToRun>
+	<PublishTrimmed>false</PublishTrimmed>
     <TieredCompilation>false</TieredCompilation>
+	<MonoGamePlatform>DesktopGL</MonoGamePlatform>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -29,6 +31,8 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="Myra" Version="1.0.2.211" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="SoundTouch.Net" Version="2.2.0" />
+    <PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helper\Main\" />
@@ -40,6 +44,9 @@
     <Folder Include="Systems\Draw\" />
     <Folder Include="Systems\Animation\" />
     <Folder Include="Systems\Map\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NAudio-1.10.0\NAudio\NAudio.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Maps\Dummy.map">

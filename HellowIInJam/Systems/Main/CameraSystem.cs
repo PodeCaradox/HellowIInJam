@@ -1,6 +1,5 @@
 ﻿using DefaultEcs;
 using DefaultEcs.System;
-using CastleSim.Components;
 using CastleSim.Systems.HelperClasses;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HellowIInJam.Main.Components;
+using HellowIInJam.Components.Objects.Player;
 
 namespace CastleSim.Systems.Update
 {
@@ -21,6 +22,7 @@ namespace CastleSim.Systems.Update
        
 
         private readonly World _world;
+        private readonly Entity _player;
 
         #endregion
 
@@ -30,9 +32,9 @@ namespace CastleSim.Systems.Update
           : base(world)
         {
             _world = world;
-
+            _player = _world.GetEntities().With<Player>().AsSet().GetEntities()[0];
             //minimapView
-           
+
         }
 
         #endregion
@@ -50,30 +52,32 @@ namespace CastleSim.Systems.Update
         {
             KeyboardState keyboard = Keyboard.GetState();
 
-            if (keyboard.IsKeyDown(Keys.W))
-            {
-                component.Changed = true;
-                component.CameraPosition.Y -= component.CameraSpeed * elaspedTime;
-            }
+            component.Changed = true;
+            component.CameraPosition.Y -= _player.Get<Player>().Speed;
+            //if (keyboard.IsKeyDown(Keys.W))
+            //{
+            //    component.Changed = true;
+            //    component.CameraPosition.Y -= component.CameraSpeed * elaspedTime;
+            //}
 
-            if (keyboard.IsKeyDown(Keys.S))
-            {
-                component.Changed = true;
-                component.CameraPosition.Y += component.CameraSpeed * elaspedTime;
+            //if (keyboard.IsKeyDown(Keys.S))
+            //{
+            //    component.Changed = true;
+            //    component.CameraPosition.Y += component.CameraSpeed * elaspedTime;
 
-            }
+            //}
 
-            if (keyboard.IsKeyDown(Keys.D))
-            {
-                component.Changed = true;
-                component.CameraPosition.X +=  component.CameraSpeed * elaspedTime;
-            }
+            //if (keyboard.IsKeyDown(Keys.D))
+            //{
+            //    component.Changed = true;
+            //    component.CameraPosition.X += component.CameraSpeed * elaspedTime;
+            //}
 
-            if (keyboard.IsKeyDown(Keys.A))
-            {
-                component.Changed = true;
-                component.CameraPosition.X -=  component.CameraSpeed * elaspedTime;
-            }
+            //if (keyboard.IsKeyDown(Keys.A))
+            //{
+            //    component.Changed = true;
+            //    component.CameraPosition.X -= component.CameraSpeed * elaspedTime;
+            //}
 
             component.PreviousMouseWheelValue = component.CurrentMouseWheelValue;
             component.CurrentMouseWheelValue = Mouse.GetState().ScrollWheelValue;

@@ -1,5 +1,4 @@
 ﻿using DefaultEcs;
-using CastleSim.Components;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using HellowIInJam.Components.Main;
+using HellowIInJam.Main.Components;
 
 namespace CastleSim.Systems.HelperClasses
 {
@@ -63,15 +63,17 @@ namespace CastleSim.Systems.HelperClasses
                 MathHelper.Max(tl.Y, MathHelper.Max(tr.Y, MathHelper.Max(bl.Y, br.Y))));
             component.VisibleArea = new Rectangle((int)min.X, (int)min.Y, (int)Math.Round(max.X - min.X, 0), (int)Math.Round(max.Y - min.Y, 0));
             component.Offset = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y));
+       
             if (component.ZoomChanged)
             {
                 var TopLef = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X, component.VisibleArea.Y));
                 var TopRig = component.Offset;
                 var BottomRig = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y + component.VisibleArea.Height));
                 ref var gameConfig = ref _gameConfig.Get<GameConfig>();
-                component.ColumnsToDraw = BottomRig.X - TopRig.X;
-                component.ColumnsToDraw = 30;
-                component.RowsToDraw = TopRig.X - TopLef.X;
+                component.ColumnsToDraw = TopRig.X - TopLef.X + 2;
+               
+                component.RowsToDraw =  BottomRig.Y - TopRig.Y + 2;
+
                 component.ZoomChanged = false;
             }
 
