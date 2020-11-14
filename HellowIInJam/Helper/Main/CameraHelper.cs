@@ -62,13 +62,13 @@ namespace CastleSim.Systems.HelperClasses
                 MathHelper.Max(tl.X, MathHelper.Max(tr.X, MathHelper.Max(bl.X, br.X))),
                 MathHelper.Max(tl.Y, MathHelper.Max(tr.Y, MathHelper.Max(bl.Y, br.Y))));
             component.VisibleArea = new Rectangle((int)min.X, (int)min.Y, (int)Math.Round(max.X - min.X, 0), (int)Math.Round(max.Y - min.Y, 0));
-            component.Offset = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y));
+            component.Offset = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y));
        
             if (component.ZoomChanged)
             {
-                var TopLef = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X, component.VisibleArea.Y));
+                var TopLef = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X, component.VisibleArea.Y));
                 var TopRig = component.Offset;
-                var BottomRig = PosTransformer.ScreenToWorldPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y + component.VisibleArea.Height));
+                var BottomRig = PosTransformer.ScreenToChunkPos(new Point(component.VisibleArea.X + component.VisibleArea.Width, component.VisibleArea.Y + component.VisibleArea.Height));
                 ref var gameConfig = ref _gameConfig.Get<GameConfig>();
                 component.ColumnsToDraw = TopRig.X - TopLef.X + 2;
                

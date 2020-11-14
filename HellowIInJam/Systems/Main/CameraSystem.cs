@@ -50,34 +50,7 @@ namespace CastleSim.Systems.Update
 
         private void UpdateInput(ref Camera component, float elaspedTime)
         {
-            KeyboardState keyboard = Keyboard.GetState();
-
-            component.Changed = true;
-            component.CameraPosition.Y -= _player.Get<Player>().Speed;
-            //if (keyboard.IsKeyDown(Keys.W))
-            //{
-            //    component.Changed = true;
-            //    component.CameraPosition.Y -= component.CameraSpeed * elaspedTime;
-            //}
-
-            //if (keyboard.IsKeyDown(Keys.S))
-            //{
-            //    component.Changed = true;
-            //    component.CameraPosition.Y += component.CameraSpeed * elaspedTime;
-
-            //}
-
-            //if (keyboard.IsKeyDown(Keys.D))
-            //{
-            //    component.Changed = true;
-            //    component.CameraPosition.X += component.CameraSpeed * elaspedTime;
-            //}
-
-            //if (keyboard.IsKeyDown(Keys.A))
-            //{
-            //    component.Changed = true;
-            //    component.CameraPosition.X -= component.CameraSpeed * elaspedTime;
-            //}
+           
 
             component.PreviousMouseWheelValue = component.CurrentMouseWheelValue;
             component.CurrentMouseWheelValue = Mouse.GetState().ScrollWheelValue;

@@ -6,6 +6,7 @@ using HellowIInJam.Components.Map;
 using Microsoft.Xna.Framework.Content;
 using HellowIInJam.Main.Components;
 using HellowIInJam.Components.Shared;
+using System.Diagnostics;
 
 namespace CastleSim.Systems
 {
@@ -33,12 +34,17 @@ namespace CastleSim.Systems
             ref Map map = ref entity.Get<Map>();
 
             _batch.Begin(SpriteSortMode.Deferred,samplerState: SS_PointBorder, transformMatrix: _camera.Get<Camera>().Transform);
-
-            for (int i = 0; i < map.TilesToDraw; i++)
+        
+            for (int i = 0; i < map.ChunksToDraw; i++)
             {
-                ref var tile = ref map.ToDraw[i].Get<MapTile>();
-                ref var texture = ref map.ToDraw[i].Get<TextureShared>();
-                _batch.Draw(texture.TextureSheet, tile.Position, new Rectangle(tile.TileID * 16, 0, 16, 16), Color.White);
+                ref var room = ref map.ToDraw[i].Get<Room>();
+                for (int index = 0; index < room.Tiles.Length; index++)
+                {
+                    ref var tile = ref room.Tiles[index].Get<MapTile>();
+                    ref var texture = ref room.Tiles[index].Get<TextureShared>();
+                    _batch.Draw(texture.TextureSheet, tile.Position, new Rectangle(tile.TileID * 16, 0, 16, 16), Color.White);
+                }
+             
             }
             
 

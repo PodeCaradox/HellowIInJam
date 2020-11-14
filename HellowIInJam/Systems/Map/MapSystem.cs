@@ -37,10 +37,11 @@ namespace CastleSim.Systems.Update
         {
 
             ref Camera cameraData = ref _camera.Get<Camera>();
-
-            //number of tiles that will get drawn
+            ref GameConfig gameConfig = ref _gameConfig.Get<GameConfig>();
             
-          
+            //number of tiles that will get drawn
+
+
             int counter = 0;
             for (int y = 0; y < cameraData.RowsToDraw; y++)
             {
@@ -56,13 +57,16 @@ namespace CastleSim.Systems.Update
                         map.ToDraw.Add(default);
                     }
 
-                    map.ToDraw[counter] = map.Tiles[xOffset + yIndex * map.Size.X];
+                    if (map.Chunks[xOffset + yIndex * map.Size.X].Get<Room>().Visible)
+                    {
+                        map.ToDraw[counter] = map.Chunks[xOffset + yIndex * map.Size.X ];
 
 
-                    counter++;
+                        counter++;
+                    }
                 }
             }
-            map.TilesToDraw = counter;
+            map.ChunksToDraw = counter;
 
 
         }

@@ -9,8 +9,8 @@ namespace HellowIInJam.Components.Map
     public struct Map
     {
         public Point Size;
-        public Entity[] Tiles;
-        public int TilesToDraw;
+        public int ChunksToDraw;
+        public Entity[] Chunks;
         public List<Entity> ToDraw;
     }
 }

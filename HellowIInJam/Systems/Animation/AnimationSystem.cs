@@ -26,13 +26,14 @@ namespace HellowIInJam.Systems.Animation
         {
             ref var gameObject = ref entity.Get<GameObject>();
             ref var animatedData = ref entity.Get<Animated>();
-            animatedData.ElapsedTime += elaspedTime;
-            if (animatedData.AnimationChangeTimer < animatedData.ElapsedTime)
+            animatedData.ActualDelay += elaspedTime;
+            if (animatedData.MaxDelayAnimation < animatedData.ActualDelay)
             {
-                animatedData.ElapsedTime = 0;
-                animatedData.Index++;
-                if (animatedData.Index > animatedData.MaxIndex) animatedData.Index = 0;
-                gameObject.SourceRect.X = animatedData.Index * 16;
+                animatedData.ActualDelay = 0;
+                animatedData.ActualAnimationIndex++;
+
+                if (animatedData.Sources.Length <= animatedData.ActualAnimationIndex) animatedData.ActualAnimationIndex = 0;
+                gameObject.SourceRect.Location = animatedData.Sources[animatedData.ActualAnimationIndex];
             }
         }
 

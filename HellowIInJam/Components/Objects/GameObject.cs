@@ -2,12 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using tainicom.Aether.Physics2D.Dynamics;
 
 namespace HellowIInJam.Components.Objects
 {
     public struct GameObject
     {
-        public Vector2 Position;
+        public Body PlayerBody;
         public Rectangle SourceRect;
+        public Vector2 Offset;
+        public float LayerDepth;
+        public Vector2 Velocity;
+       
     }
 }

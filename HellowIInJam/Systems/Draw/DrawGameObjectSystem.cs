@@ -35,7 +35,7 @@ namespace HellowIInJam.Systems.Draw
 
         protected override void PreUpdate(float state)
         {
-            _batch.Begin(SpriteSortMode.Deferred, samplerState: SS_PointBorder, transformMatrix: _camera.Get<Camera>().Transform);
+            _batch.Begin(SpriteSortMode.FrontToBack, samplerState: SS_PointBorder, transformMatrix: _camera.Get<Camera>().Transform);
         }
 
         protected override void Update(float elaspedTime, in Entity entity)
@@ -44,7 +44,7 @@ namespace HellowIInJam.Systems.Draw
             ref TextureShared texture = ref entity.Get<TextureShared>();
 
 
-            _batch.Draw(texture.TextureSheet,gameObject.Position,gameObject.SourceRect, Color.White);
+            _batch.Draw(texture:texture.TextureSheet,position:gameObject.PlayerBody.Position - gameObject.Offset, gameObject.SourceRect,color: Color.White,0,Vector2.Zero,1,SpriteEffects.None,layerDepth: gameObject.LayerDepth);
 
         }
 

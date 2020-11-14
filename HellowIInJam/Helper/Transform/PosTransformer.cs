@@ -32,6 +32,35 @@ namespace CastleSim.Systems.HelperClasses
             return point;
         }
 
+        internal static Point ScreenToChunkPos(Point position)
+        {
+            ref var gameConfig = ref _gameConfig.Get<GameConfig>();
+            Point point = new Point(position.X / gameConfig.TileSize.X / gameConfig.ChunkSize, position.Y / gameConfig.TileSize.Y / gameConfig.ChunkSize);
+            return point;
+        }
+
+        internal static Point ScreenToChunkPos(Vector2 position)
+        {
+            ref var gameConfig = ref _gameConfig.Get<GameConfig>();
+            Point point = new Point((int)position.X / gameConfig.TileSize.X / gameConfig.ChunkSize, (int)position.Y / gameConfig.TileSize.Y / gameConfig.ChunkSize);
+            return point;
+        }
+
+        internal static int ScreenToChunkKKey(Vector2 position)
+        {
+            ref var gameConfig = ref _gameConfig.Get<GameConfig>();
+            ref var map = ref _map.Get<Map>();
+            Point point = new Point((int)position.X / gameConfig.TileSize.X / gameConfig.ChunkSize, (int)position.Y / gameConfig.TileSize.Y / gameConfig.ChunkSize);
+            return point.X + point.Y * map.Size.X;
+        }
+
+        internal static float ScreenToDepth(Vector2 position)
+        {
+            ref var gameConfig = ref _gameConfig.Get<GameConfig>();
+            ref var map = ref _map.Get<Map>();
+             return position.Y/ (map.Size.Y * gameConfig.ChunkSize * gameConfig.TileSize.Y);
+        }
+
         internal static int CalculateWorldIndex(Point position)
         {
             ref var mapData = ref _map.Get<Map>();

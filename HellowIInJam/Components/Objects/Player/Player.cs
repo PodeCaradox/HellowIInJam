@@ -10,6 +10,8 @@ namespace HellowIInJam.Components.Objects.Player
         public float ElapsedTime;
         public float ElapsedTimeChangeSpeed;
         public float Speed;
+        public bool Transformed;
+        public float MaxSpeed;
 
     }
 }

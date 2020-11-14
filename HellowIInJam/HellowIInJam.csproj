@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRun>false</PublishReadyToRun>
 	<PublishTrimmed>false</PublishTrimmed>
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -11,6 +11,12 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />
@@ -27,6 +33,7 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Aether.Physics2D.MG" Version="1.5.0" />
     <PackageReference Include="DefaultEcs" Version="0.14.4" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
@@ -36,12 +43,9 @@
     <PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Helper\Main\" />
     <Folder Include="Helper\Map\" />
     <Folder Include="Helper\Transform\" />
-    <Folder Include="Json\" />
     <Folder Include="Maps\" />
-    <Folder Include="Systems\Main\" />
     <Folder Include="Systems\Draw\" />
     <Folder Include="Systems\Animation\" />
     <Folder Include="Systems\Map\" />
@@ -50,6 +54,21 @@
     <ProjectReference Include="..\..\NAudio-1.10.0\NAudio\NAudio.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Dungeons\Dungeon1.dung">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dungeons\Room0.room">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dungeons\Room1.room">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dungeons\Room2.room">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dungeons\Room3.room">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="Maps\Dummy.map">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
