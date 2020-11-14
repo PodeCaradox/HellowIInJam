@@ -30,15 +30,25 @@ namespace HellowIInJam.Systems.Main
         {
             ref var gameObject = ref entity.Get<GameObject>();
             ref var moveAndSlide = ref entity.Get<MoveAndSlide>();
+            ref var animated = ref entity.Get<Animated>();
 
-           
             if (moveAndSlide.Index % 100 < 50)
             {
-                gameObject.PlayerBody.LinearVelocity = new Vector2(100,0);
+                gameObject.PlayerBody.ApplyForce(new Vector2(1000000, 0));
+                if(animated.Direction != Animated.Directions.Right)
+                {
+                    animated.Direction = Animated.Directions.Right;
+                    animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Right.ToString());
+                }
             }
             else
             {
-                gameObject.PlayerBody.LinearVelocity = new Vector2(-100, 0);
+                gameObject.PlayerBody.ApplyForce(new Vector2(-1000000, 0));
+                if (animated.Direction != Animated.Directions.Left)
+                {
+                    animated.Direction = Animated.Directions.Left;
+                    animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Left.ToString());
+                }
             }
 
         

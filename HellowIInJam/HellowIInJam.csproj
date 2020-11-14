@@ -46,7 +46,6 @@
     <Folder Include="Helper\Map\" />
     <Folder Include="Helper\Transform\" />
     <Folder Include="Maps\" />
-    <Folder Include="Systems\Draw\" />
     <Folder Include="Systems\Animation\" />
     <Folder Include="Systems\Map\" />
   </ItemGroup>

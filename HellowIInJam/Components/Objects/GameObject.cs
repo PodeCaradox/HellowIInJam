@@ -8,11 +8,12 @@ namespace HellowIInJam.Components.Objects
 {
     public struct GameObject
     {
+        public int ID;
         public Body PlayerBody;
         public Rectangle SourceRect;
         public Vector2 Offset;
         public float LayerDepth;
         public Vector2 Velocity;
-       
+        public Vector2 AnimationOffset;
     }
 }

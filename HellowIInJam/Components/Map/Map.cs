@@ -12,5 +12,7 @@ namespace HellowIInJam.Components.Map
         public int ChunksToDraw;
         public Entity[] Chunks;
         public List<Entity> ToDraw;
+        
+        public Dictionary<int, Entity> DefaulObjects;
     }
 }

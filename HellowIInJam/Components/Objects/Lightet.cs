@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HellowIInJam.Components.Objects
 {
-    public struct NeedsToCheckCollision
+    public struct Lightet
     {
     }
 }

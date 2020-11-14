@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using tainicom.Aether.Physics2D.Collision;
 
 namespace HellowIInJam.Systems.Main
 {
@@ -36,84 +37,257 @@ namespace HellowIInJam.Systems.Main
             ref var gameObject = ref entity.Get<GameObject>();
             ref var player = ref entity.Get<Player>();
             ref var animated = ref entity.Get<Animated>();
-
+            
             KeyboardState keyboard = Keyboard.GetState();
+            MouseState mouse = Mouse.GetState();
             gameObject.PlayerBody.LinearVelocity = new Vector2(0, 0);
-            bool gedrueckt = false;
-            if (keyboard.IsKeyDown(Keys.W))
+            Vector2 force = Vector2.Zero;
+            bool moved = false;
+            bool isAttacking = false;
+            if (animated.Direction != Animated.Directions.AttackLeft &&
+                animated.Direction != Animated.Directions.AttackRight &&
+                animated.Direction != Animated.Directions.AttackDown &&
+                animated.Direction != Animated.Directions.AttackTop)
             {
-                gameObject.Velocity += new Vector2(0, -player.Speed);
-                if(gameObject.Velocity.Y < -player.MaxSpeed) gameObject.Velocity = new Vector2(0, -100);
-
-                CheckAnimation(Animated.Directions.Up,ref animated, player.Transformed);
-                gedrueckt = true;
-            }
-            else if (keyboard.IsKeyDown(Keys.S))
-            {
-                gameObject.Velocity += new Vector2(0, player.Speed);
-                if (gameObject.Velocity.Y > player.MaxSpeed) gameObject.Velocity = new Vector2(0, 100);
-
-                CheckAnimation(Animated.Directions.Down, ref animated, player.Transformed);
-                gedrueckt = true;
-            }
-            
-
-            if (keyboard.IsKeyDown(Keys.D))
-            {
-                gameObject.Velocity += new Vector2(player.Speed, 0);
-                if (gameObject.Velocity.X > player.MaxSpeed) gameObject.Velocity = new Vector2(100, 0);
-                CheckAnimation(Animated.Directions.Right, ref animated, player.Transformed);
-                gedrueckt = true;
-            }
-            else if (keyboard.IsKeyDown(Keys.A))
-            {
-              
-                gameObject.Velocity += new Vector2(-player.Speed, 0);
-                if (gameObject.Velocity.X < -player.MaxSpeed) gameObject.Velocity = new Vector2(-100, 0);
-                CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed);
-                gedrueckt = true;
-            }
-            
-            if(!gedrueckt)
-            {
-                if (gameObject.Velocity != Vector2.Zero)
-                {
-                    if (gameObject.Velocity.X > 0) gameObject.Velocity.X -= player.Speed;
-                    else if (gameObject.Velocity.X < 0) gameObject.Velocity.X += player.Speed;
-                    else if (gameObject.Velocity.Y > 0) gameObject.Velocity.Y -= player.Speed;
-                    else if (gameObject.Velocity.Y < 0) gameObject.Velocity.Y += player.Speed;
-                    
-                    if (gameObject.Velocity.Y > -player.Speed && gameObject.Velocity.Y < player.Speed && gameObject.Velocity.X > -player.Speed && gameObject.Velocity.X < player.Speed) gameObject.Velocity = Vector2.Zero;
                 
+                
+                if ((keyboard.IsKeyDown(Keys.W) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.S) && player.Invertiert && player.Transformed))
+                {
+                    force = new Vector2(0, -player.Speed);
+                    moved = true;
+
+                    CheckAnimation(Animated.Directions.Up, ref animated, player.Transformed, player.Demonized);
+
+                }
+                else if ((keyboard.IsKeyDown(Keys.S) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.W) && player.Invertiert && player.Transformed))
+                {
+                    force = new Vector2(0, player.Speed);
+                    moved = true;
+                    CheckAnimation(Animated.Directions.Down, ref animated, player.Transformed, player.Demonized);
+
+                }
+
+
+                if ((keyboard.IsKeyDown(Keys.D) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.A) && player.Invertiert && player.Transformed))
+                {
+                    moved = true;
+                    force = new Vector2(player.Speed, 0);
+                    CheckAnimation(Animated.Directions.Right, ref animated, player.Transformed, player.Demonized);
+
+                }
+                else if ((keyboard.IsKeyDown(Keys.A) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.D) && player.Invertiert && player.Transformed))
+                {
+                    moved = true;
+                    force = new Vector2(-player.Speed, 0);
+                    CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed, player.Demonized);
+
+                }
+
+                #region Idle
+                if (!moved)
+                {
+                    //CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed, player.Demonized);
+                }
+                #endregion
+
+
+                if (mouse.LeftButton == ButtonState.Pressed && player.Transformed && animated.EndReached)
+                {
+                    animated.EndReached = false;
+                    animated.ActualAnimationIndex = -1;
+                    animated.ActualDelay = animated.MaxDelayAnimation + 1;
+                    if (animated.Direction == Animated.Directions.Down)
+                    {
+                        force = new Vector2(0, player.Speed * 5);
+                        CheckAnimation(Animated.Directions.AttackDown, ref animated, player.Transformed, player.Demonized,true);
+                    }
+                    else if (animated.Direction == Animated.Directions.Up)
+                    {
+                        force = new Vector2(0, -player.Speed * 5);
+                        CheckAnimation(Animated.Directions.AttackTop, ref animated, player.Transformed, player.Demonized, true);
+                    }
+                    else if (animated.Direction == Animated.Directions.Right)
+                    {
+                        force = new Vector2(player.Speed * 5, 0);
+                        CheckAnimation(Animated.Directions.AttackRight, ref animated, player.Transformed, player.Demonized, true);
+                    }
+                    else if (animated.Direction == Animated.Directions.Left)
+                    {
+                        force = new Vector2(-player.Speed * 5, 0);
+                        CheckAnimation(Animated.Directions.AttackLeft, ref animated, player.Transformed, player.Demonized, true);
+                    }
+                    else
+                    {
+                       
+                        CheckAnimation(Animated.Directions.AttackDown, ref animated, player.Transformed, player.Demonized, true);
+                    }
+
+                    gameObject.AnimationOffset = new Vector2(-8, 0);
+                    var dummy = gameObject.SourceRect;
+                    dummy.Width = 32;
+                    gameObject.SourceRect = dummy;
+
+                }
+
+
+            }
+            else
+            {
+                isAttacking = true;
+                if (animated.Direction == Animated.Directions.AttackDown)
+                {
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, 10);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery,aabb:new AABB(dummy, dummy + new Vector2(20,20)));
+                }
+                else if (animated.Direction == Animated.Directions.AttackTop)
+                {
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, 0);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(20, -20)));
+                }
+                else if (animated.Direction == Animated.Directions.AttackRight)
+                {
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(8, 0);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(20, 20)));
+                }
+                else if (animated.Direction == Animated.Directions.AttackLeft)
+                {
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, 0);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(-20, 20)));
+                }
+
+               
+                
+
+                if (animated.ActualAnimationIndex > 1 && animated.ActualAnimationIndex < 5)
+                {
+                    if (animated.Direction == Animated.Directions.AttackDown)
+                    {
+                        force = new Vector2(0, player.Speed * 10);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackTop)
+                    {
+                        force = new Vector2(0, -player.Speed * 10);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackRight)
+                    {
+                        force = new Vector2(player.Speed * 10, 0);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackLeft)
+                    {
+                        force = new Vector2(-player.Speed * 10, 0);
+                    }
                 }
                
-            }
-            
-            gameObject.PlayerBody.LinearVelocity += gameObject.Velocity;
-            if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F))
-            {
-                player.Transformed = !player.Transformed;
-                animated.Sources = animated.Animations.GetValueOrDefault(animated.Direction.ToString() + ((player.Transformed) ? "_Wolf" : ""));
+
+                if (animated.EndReached)
+                {
+                    gameObject.AnimationOffset = new Vector2(0, 0);
+                    animated.ActualAnimationIndex = -1;
+                    animated.ActualDelay = animated.MaxDelayAnimation + 1;
+                    var dummy = gameObject.SourceRect;
+                    dummy.Width = 16;
+                    gameObject.SourceRect = dummy;
+                    if (animated.Direction == Animated.Directions.AttackDown)
+                    {
+                        CheckAnimation(Animated.Directions.Down, ref animated, player.Transformed, player.Demonized);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackTop)
+                    {
+                        CheckAnimation(Animated.Directions.Up, ref animated, player.Transformed, player.Demonized);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackRight)
+                    {
+                        CheckAnimation(Animated.Directions.Right, ref animated, player.Transformed, player.Demonized);
+                    }
+                    else if (animated.Direction == Animated.Directions.AttackLeft)
+                    {
+                        CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed, player.Demonized);
+                    }
+                   
+                    
+                }
             }
 
-            keyboardStateBefore = keyboard;
+            #region Timer
+            if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
+            // 4 sekunden
+            if (player.werwolfTimer > 4000)
+            {
+                player.werwolfTimer = 0;
+                if (player.Demonized < 3) player.Demonized++;
+                if (!player.Transformed)
+                    if (player.Demonized == 2) player.Invertiert = true;
+                if (player.Demonized == 3) player.Transformed = true;
+            }
+            #endregion
+
+
+
+            player.Direction = force;
+            gameObject.PlayerBody.ApplyForce(force);
+            if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F))
+            {
+                
+                if (player.Demonized != 3 && !isAttacking) {
+                    player.Transformed = !player.Transformed;
+
+                    if (!player.Transformed)
+                        if (player.Demonized == 2) player.Invertiert = true;
+
+
+                    String dummy = animated.Direction.ToString() + ((player.Transformed) ? "_Wolf" : "") + ((!player.Transformed && player.Demonized > 0) ? player.Demonized.ToString() : "");
+                    animated.Sources = animated.Animations.GetValueOrDefault(dummy);
+
+                }
+              
+            }
+
+           
+
+               
             if(component.CameraPosition != gameObject.PlayerBody.Position) component.Changed = true;
             component.CameraPosition = gameObject.PlayerBody.Position;
 
             gameObject.LayerDepth = PosTransformer.ScreenToDepth(gameObject.PlayerBody.Position);
+            var chunk = PosTransformer.ScreenToChunkKKey(gameObject.PlayerBody.Position);
+            if(player.ChunkBefore != chunk)
+            ChunkHelper.ActivateLight(player.ChunkBefore, chunk);
+            player.ChunkBefore = chunk;
 
+           
+            keyboardStateBefore = keyboard;
 
+            if (isAttacking)
+            {
+                if (ChunkHelper.AllDead(chunk))
+                {
+                    ChunkHelper.OpenDorrs(chunk);
+                }
+            }
         }
 
-        private void CheckAnimation(Animated.Directions animationCurrent,ref Animated animated,bool transformed)
+        private bool CallbackQuery(tainicom.Aether.Physics2D.Dynamics.Fixture fixture)
         {
-            if (animated.Direction != animationCurrent)
+            if (fixture.Body.Tag != null)
+            {
+                if (((Entity)fixture.Body.Tag).Has<Enemy>())
+                {
+                    fixture.Body.World.Remove(fixture.Body);
+                    ((Entity)fixture.Body.Tag).Disable();
+                }
+            }
+            return true;
+        }
+
+        private void CheckAnimation(Animated.Directions animationCurrent,ref Animated animated,bool transformed, int demonLevel,bool isAttack = false)
+        {
+            if (animated.Direction != animationCurrent || isAttack)
             {
 
                 //animated.ActualDelay = 0;
                 //animated.ActualAnimationIndex = 0;
                 animated.Direction = animationCurrent;
-                animated.Sources = animated.Animations.GetValueOrDefault(animationCurrent.ToString() +( (transformed)?"_Wolf":""));
+                animated.Sources = animated.Animations.GetValueOrDefault(animationCurrent.ToString() +( (transformed)?"_Wolf":"") + ((!transformed && demonLevel>0)? demonLevel.ToString() : ""));
             }
         }
     }

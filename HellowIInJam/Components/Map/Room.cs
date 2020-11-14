@@ -11,5 +11,8 @@ namespace HellowIInJam.Components.Map
         public bool Visible;
         public Entity[] Tiles;
         public List<Entity> GameObjects;
+        public List<Entity> Doors;
+        public List<Entity> Enemys;
+        public bool Open;
     }
 }

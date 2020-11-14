@@ -7,7 +7,7 @@ namespace HellowIInJam.Components.Objects
 {
     public struct Animated
     {
-        public enum Directions { Down,Up,Left,Right }
+        public enum Directions { Down,Up,Left,Right,Idle,AttackLeft, AttackRight, AttackTop, AttackDown }
 
         public Directions Direction;
         public Dictionary<String, Point[]> Animations;
@@ -15,5 +15,6 @@ namespace HellowIInJam.Components.Objects
         public int ActualAnimationIndex;
         public Point[] Sources;
         public float ActualDelay;
+        public bool EndReached;
     }
 }

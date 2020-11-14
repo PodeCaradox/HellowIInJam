@@ -32,7 +32,10 @@ namespace HellowIInJam.Systems.Animation
                 animatedData.ActualDelay = 0;
                 animatedData.ActualAnimationIndex++;
 
-                if (animatedData.Sources.Length <= animatedData.ActualAnimationIndex) animatedData.ActualAnimationIndex = 0;
+                if (animatedData.Sources.Length <= animatedData.ActualAnimationIndex) { 
+                    animatedData.ActualAnimationIndex = 0;
+                    animatedData.EndReached = true;
+                }
                 gameObject.SourceRect.Location = animatedData.Sources[animatedData.ActualAnimationIndex];
             }
         }

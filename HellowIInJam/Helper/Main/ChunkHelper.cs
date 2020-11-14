@@ -30,12 +30,41 @@ namespace HellowIInJam.Helper.Main
 
         }
 
-        internal static void ActivateCollision(int before, int after)
+        internal static void ActivateLight(int before, int after)
         {
             ref var mapData = ref _map.Get<Map>();
-            if (mapData.Chunks[before].Has<NeedsToCheckCollision>()) mapData.Chunks[before].Remove<NeedsToCheckCollision>();
-            mapData.Chunks[after].Set<NeedsToCheckCollision>();
+            if (before != -1 && mapData.Chunks[before].Has<Lightet>()) mapData.Chunks[before].Remove<Lightet>();
+            mapData.Chunks[after].Set<Lightet>();
 
+            if(!mapData.Chunks[after].Get<Room>().Open)
+            for (int i = 0; i < mapData.Chunks[after].Get<Room>().Doors.Count; i++)
+            {
+                mapData.Chunks[after].Get<Room>().Doors[i].Get<Door>().Opnened = false;
+            }
+            
+        }
+
+        internal static void OpenDorrs(int key)
+        {
+            ref var mapData = ref _map.Get<Map>();
+            if (mapData.Chunks[key].Get<Room>().Open) return;
+            for (int i = 0; i < mapData.Chunks[key].Get<Room>().Doors.Count; i++)
+            {
+                mapData.Chunks[key].Get<Room>().Doors[i].Set<Open>();
+            }
+            mapData.Chunks[key].Get<Room>().Open = true;
+
+        }
+
+        internal static bool AllDead(int chunk)
+        {
+            ref var mapData = ref _map.Get<Map>();
+            ref var room = ref mapData.Chunks[chunk].Get<Room>();
+            for (int i = 0; i < room.Enemys.Count; i++)
+            {
+                if (room.Enemys[i].IsEnabled()) return false;
+            }
+            return true;
         }
     }
 }
