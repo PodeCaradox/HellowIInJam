@@ -1,20 +1,24 @@
-﻿using DefaultEcs;
+﻿using CastleSim.Systems.HelperClasses;
+using DefaultEcs;
 using HellowIInJam.Components.Map;
 using HellowIInJam.Components.Objects;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Xna.Framework;
+using tainicom.Aether.Physics2D.Dynamics;
+using World = DefaultEcs.World;
 
 namespace HellowIInJam.Helper.Main
 {
     public static class ChunkHelper
     {
         private static Entity _map;
-        public static void Init(World world)
+        private static tainicom.Aether.Physics2D.Dynamics.World _physicsWorld;
+        private static World _world;
+        public static void Init(World world, tainicom.Aether.Physics2D.Dynamics.World PhysicsWorld)
         {
             _map = world.GetEntities().With<Map>().AsSet().GetEntities()[0];
-    
-            
+            _physicsWorld = PhysicsWorld;
+            _world = world;
+
         }
 
         public static void Delete(Entity entity,int key)
@@ -36,11 +40,33 @@ namespace HellowIInJam.Helper.Main
             if (before != -1 && mapData.Chunks[before].Has<Lightet>()) mapData.Chunks[before].Remove<Lightet>();
             mapData.Chunks[after].Set<Lightet>();
 
-            if(!mapData.Chunks[after].Get<Room>().Open)
-            for (int i = 0; i < mapData.Chunks[after].Get<Room>().Doors.Count; i++)
+            if (!mapData.Chunks[after].Get<Room>().Open)
             {
-                mapData.Chunks[after].Get<Room>().Doors[i].Get<Door>().Opnened = false;
+                for (int i = 0; i < mapData.Chunks[after].Get<Room>().Doors.Count; i++)
+                {
+                    mapData.Chunks[after].Get<Room>().Doors[i].Get<Door>().Opnened = false;
+                }
+
+                Vector2 startPosie = mapData.Chunks[after].Get<Room>().Tiles[22].Get<MapTile>().Position;
+                for (int i = 0; i < 10; i++)
+                {
+
+                    var enemy = mapData.Enemys[i % 2].CopyTo(_world);
+                    enemy.Enable();
+                    ref var gameObject = ref enemy.Get<GameObject>();
+                    var posi = startPosie + new Vector2(20,60);
+                    gameObject.LayerDepth = PosTransformer.ScreenToDepth(posi);
+                    var dummy = _physicsWorld.CreateRectangle(4, 20, 1f, posi);
+                    dummy.BodyType = BodyType.Dynamic;
+                    dummy.Mass = 100;
+                    dummy.Tag = enemy;
+                    gameObject.PlayerBody = dummy;
+
+                    mapData.Chunks[after].Get<Room>().Enemys.Add(enemy);
+                }
             }
+           
+         
             
         }
 

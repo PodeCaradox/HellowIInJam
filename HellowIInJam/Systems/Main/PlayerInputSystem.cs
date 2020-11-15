@@ -133,26 +133,27 @@ namespace HellowIInJam.Systems.Main
             }
             else
             {
+                int range = 10;
                 isAttacking = true;
                 if (animated.Direction == Animated.Directions.AttackDown)
                 {
                     var dummy = gameObject.PlayerBody.Position + new Vector2(0, 10);// new Vector2(8, 10)
-                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery,aabb:new AABB(dummy, dummy + new Vector2(20,20)));
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery,aabb:new AABB(dummy, dummy + new Vector2(range, range)));
                 }
                 else if (animated.Direction == Animated.Directions.AttackTop)
                 {
-                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, 0);// new Vector2(8, 10)
-                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(20, -20)));
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, -20);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(range, range)));
                 }
                 else if (animated.Direction == Animated.Directions.AttackRight)
                 {
                     var dummy = gameObject.PlayerBody.Position + new Vector2(8, 0);// new Vector2(8, 10)
-                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(20, 20)));
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(range, range)));
                 }
                 else if (animated.Direction == Animated.Directions.AttackLeft)
                 {
-                    var dummy = gameObject.PlayerBody.Position + new Vector2(0, 0);// new Vector2(8, 10)
-                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(-20, 20)));
+                    var dummy = gameObject.PlayerBody.Position + new Vector2(-20, 0);// new Vector2(8, 10)
+                    gameObject.PlayerBody.World.QueryAABB(CallbackQuery, aabb: new AABB(dummy, dummy + new Vector2(range, range)));
                 }
 
                
@@ -211,7 +212,7 @@ namespace HellowIInJam.Systems.Main
             #region Timer
             if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
             // 4 sekunden
-            if (player.werwolfTimer > 4000)
+            if (player.werwolfTimer > 400000)
             {
                 player.werwolfTimer = 0;
                 if (player.Demonized < 3) player.Demonized++;

@@ -14,5 +14,7 @@ namespace HellowIInJam.Components.Map
         public List<Entity> ToDraw;
         
         public Dictionary<int, Entity> DefaulObjects;
+
+        public List<Entity> Enemys;
     }
 }

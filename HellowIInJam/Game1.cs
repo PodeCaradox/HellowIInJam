@@ -50,7 +50,6 @@ namespace HellowIInJam
         private Entity _camera;
         private Entity _gameConfig;
         private Entity _player;
-        private Entity _enemy;
         private Entity _sound;
         #endregion
 
@@ -138,7 +137,7 @@ namespace HellowIInJam
 
             CameraHelper.Init(_world);
             PosTransformer.Init(_world);
-            ChunkHelper.Init(_world);
+            ChunkHelper.Init(_world,_physicsWord);
             //MapHelper.Init(_world);
         }
 
@@ -406,48 +405,114 @@ namespace HellowIInJam
                 TextureSheet = Content.Load<Texture2D>("enemy")
             }
                );
-            var dict = InitEnemyAnimationsMummy();
-            for (int i = 0; i < 5; i++)
+            var dict = InitEnemyAnimationsZombie();
+            var dict1 = InitEnemyAnimationsMummy();
+            map.Enemys = new List<Entity>();
+
+            #region Zombie
+            Vector2 posi = new Vector2(-100,-400);
+
+
+            var _enemy = _world.CreateEntity();
+            map.Enemys.Add(_enemy);
+            _enemy.Disable();
+            _enemy.Set<Enemy>();
+            
+            _enemy.Set(new GameObject()
             {
-                Vector2 posi = new Vector2(_graphics.GraphicsDevice.Viewport.Bounds.Width / 2 + 40 + r.Next(20), _graphics.GraphicsDevice.Viewport.Bounds.Height / 2 + 40 + r.Next(10));
-                var dummy = _physicsWord.CreateRectangle(4, 20, 1f, posi);
-                dummy.BodyType = BodyType.Dynamic;
-                dummy.Mass = 100;
-                
-                _enemy = _world.CreateEntity();
-                _enemy.Set<Enemy>();
-                dummy.Tag = _enemy;
-                _enemy.Set(new GameObject()
-                {
-                    LayerDepth = PosTransformer.ScreenToDepth(dummy.Position),
-                    PlayerBody = dummy,
-                    SourceRect = new Rectangle(0, 0, 16, 32),
-                    Offset = new Vector2(4, 12)
-                });
+                LayerDepth = 0,
+                PlayerBody = null,
+                SourceRect = new Rectangle(0, 0, 16, 32),
+                Offset = new Vector2(4, 12)
+            });
 
-                _enemy.Set(new Animated()
-                {
-                    Animations = dict,
-                    Sources = dict.GetValueOrDefault(Animated.Directions.Right.ToString()),
-               
-                    MaxDelayAnimation = 90,
-                });
+            _enemy.Set(new Animated()
+            {
+                Animations = dict,
+                Sources = dict.GetValueOrDefault(Animated.Directions.Right.ToString()),
 
-                _enemy.Set(new MoveAndSlide()
-                {
-                    Index =  r.Next(100)
-                });
+                MaxDelayAnimation = 90,
+            });
 
-                _enemy.SetSameAs<TextureShared>(test);
+            _enemy.Set(new FollowPlayer());
 
-                map.Chunks[PosTransformer.ScreenToChunkKKey(posi)].Get<Room>().Enemys.Add(_enemy);
-            }
+            _enemy.SetSameAs<TextureShared>(test);
+
+            
+            #endregion
+
+            #region Mumie
+
+            Vector2 posi1 = new Vector2(-100,-100);
+            var dummy1 = _physicsWord.CreateRectangle(4, 20, 1f, posi);
+            dummy1.BodyType = BodyType.Dynamic;
+            dummy1.Mass = 100;
+
+            var _enemy1 = _world.CreateEntity();
+            map.Enemys.Add(_enemy1);
+            _enemy1.Disable();
+            _enemy1.Set<Enemy>();
+            
+            _enemy1.Set(new GameObject()
+            {
+                LayerDepth = 0,
+                PlayerBody = null,
+                SourceRect = new Rectangle(0, 0, 16, 32),
+                Offset = new Vector2(4, 12)
+            });
+
+            _enemy1.Set(new Animated()
+            {
+                Animations = dict1,
+                Sources = dict1.GetValueOrDefault(Animated.Directions.Right.ToString()),
+
+                MaxDelayAnimation = 90,
+            });
+
+            _enemy1.Set(new MoveAndSlide()
+            {
+                Index = r.Next(100)
+            });
+
+            _enemy1.SetSameAs<TextureShared>(test);
+
+          
+
+            #endregion
+
+            
+
+
             test.Dispose();
 
 
 
             #endregion
 
+        }
+
+        private Dictionary<String, Point[]> InitEnemyAnimationsZombie()
+        {
+            var dict = new Dictionary<String, Point[]>();
+            var sources = new Point[]{
+                   new Point(0,0),
+                   new Point(16, 0),
+                   new Point(32, 0),
+                   new Point(48, 0),
+                   new Point(64, 0),
+                   new Point(80, 0),
+                   new Point(96, 0),
+                   new Point(112, 0),
+               };
+            dict.Add(Animated.Directions.Down.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dict.Add(Animated.Directions.Up.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dict.Add(Animated.Directions.Left.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dict.Add(Animated.Directions.Right.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            return dict;
         }
 
         private bool PlayerCollision(Fixture sender, Fixture other, Contact contact)
@@ -486,14 +551,14 @@ namespace HellowIInJam
         {
             var dict = new Dictionary<String, Point[]>();
             var sources = new Point[]{
-                   new Point(0,0),
-                   new Point(16, 0),
-                   new Point(32, 0),
-                   new Point(48, 0),
-                   new Point(64, 0),
-                   new Point(80, 0),
-                   new Point(96, 0),
-                   new Point(112, 0),
+                   new Point(128 + 0,0),
+                   new Point(128 + 16, 0),
+                   new Point(128 + 32, 0),
+                   new Point(128 + 48, 0),
+                   new Point(128 + 64, 0),
+                   new Point(128 + 80, 0),
+                   new Point(128 + 96, 0),
+                   new Point(128 + 112, 0),
                };
             dict.Add(Animated.Directions.Down.ToString(), (Point[])sources.Clone());
             for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;

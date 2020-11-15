@@ -51,8 +51,11 @@ namespace HellowIInJam.Systems.Main
                 }
             }
 
-        
-          
+            gameObject.LayerDepth = PosTransformer.ScreenToDepth(gameObject.PlayerBody.Position);
+
+
+
+
             moveAndSlide.Index++;
 
         }
