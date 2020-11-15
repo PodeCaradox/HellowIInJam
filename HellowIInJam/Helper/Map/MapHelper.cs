@@ -268,7 +268,7 @@ namespace CastleSim.Systems.HelperClasses
             }
 
            
-            var mapData = JsonConvert.SerializeObject(map);
+            var mapData = JsonConvert.SerializeObject(map, Formatting.Indented);
             File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Maps" + Path.DirectorySeparatorChar + map.Name + ".map", mapData);
 
         }
@@ -290,6 +290,18 @@ namespace CastleSim.Systems.HelperClasses
                     map.MapTiles[x + y * chunksize] = 1;
                 }
             }
+            #endregion
+
+            #region Enemys
+            map.Enemys = new int[chunksize * chunksize];
+            for (int y = 0; y < chunksize; y++)
+            {
+                for (int x = 0; x < chunksize; x++)
+                {
+                    map.Enemys[x + y * chunksize] = -1;
+                }
+            }
+
             #endregion
 
             #region Walls
@@ -411,7 +423,7 @@ namespace CastleSim.Systems.HelperClasses
 
 
 
-            var mapData = JsonConvert.SerializeObject(map);
+            var mapData = JsonConvert.SerializeObject(map,Formatting.Indented);
             File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Dungeons" + Path.DirectorySeparatorChar + map.Name + ".room", mapData);
 
         }

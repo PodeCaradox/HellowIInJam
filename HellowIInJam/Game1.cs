@@ -300,19 +300,11 @@ namespace HellowIInJam
             _sound.Set(new Sound());
             #endregion
 
+            #region Generate Dungeons and Map
+
+
             /*
-                                 if(y == 0 && x == 0) map.MapTiles[x + y * map.Size.X] = 0;
-                    else if(y == 0 && x == map.Size.X - 1) map.MapTiles[x + y * map.Size.X] = 1;
-                    else if (y == map.Size.Y - 1 && x == 0) map.MapTiles[x + y * map.Size.X] = 2;
-                    else if (y == map.Size.Y - 1 && x == map.Size.X - 1) map.MapTiles[x + y * map.Size.X] = 3;
-                   
-                    else if (y == 0) map.MapTiles[x + y * map.Size.X] = 4;
-                    else if (x == 0) map.MapTiles[x + y * map.Size.X] = 6;
-                    else if (y == map.Size.Y - 1) map.MapTiles[x + y * map.Size.X] = 7;
-                    else if (x == map.Size.Y - 1) map.MapTiles[x + y * map.Size.X] = 5;
-                    
-                    else map.MapTiles[x + y * map.Size.X] = 8;
-             */
+            
 
             #region Corners
             MapHelper.SaveRoom("Room" + 0, chunksize, left: false, down: true, right: true, up: false);
@@ -331,10 +323,30 @@ namespace HellowIInJam
             #endregion
 
 
+            MapHelper.SaveRoom("Room" + "Up" , chunksize, left: false, down: false, right: false, up: true);
+            MapHelper.SaveRoom("Room" + "Right" , chunksize, left: false, down: false, right: true, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: false, right: true, up: true);
+            MapHelper.SaveRoom("Room" + "Down" , chunksize, left: false, down: true, right: false, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Down", chunksize, left: false, down: true, right: false, up: true);
+            MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: true, right: true, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down", chunksize, left: false, down: true, right: true, up: true);
+            MapHelper.SaveRoom("Room" + "Left", chunksize, left: true, down: false, right: false, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Left", chunksize, left: true, down: false, right: false, up: true);
+            MapHelper.SaveRoom("Room" + "Up" + "Right", chunksize, left: true, down: false, right: true, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Left", chunksize, left: true, down: false, right: true, up: true);
+            MapHelper.SaveRoom("Room" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: true);
+            MapHelper.SaveRoom("Room" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: false);
+            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: true);
+
+
 
             MapHelper.LoadRooms(_world);
             MapHelper.SaveMap("Dummy");
-            MapHelper.LoadMap("Dummy", _world, Content,_physicsWord);
+             */
+            #endregion
+            MapHelper.LoadRooms(_world);
+            MapHelper.LoadMap("OverMap", _world, Content,_physicsWord);
 
           
 
@@ -385,7 +397,7 @@ namespace HellowIInJam
             camera.CameraPosition = new Vector2(_graphics.GraphicsDevice.Viewport.Bounds.Width / 2 + 100, _graphics.GraphicsDevice.Viewport.Bounds.Height / 2);
 
             ref var player = ref _player.Get<GameObject>();
-            player.PlayerBody = _physicsWord.CreateRectangle(8, 10, 1f, new Vector2(_graphics.GraphicsDevice.Viewport.Bounds.Width / 2 + 100, _graphics.GraphicsDevice.Viewport.Bounds.Height / 2));
+            player.PlayerBody = _physicsWord.CreateRectangle(8, 10, 1f, new Vector2(150, 150));
             player.PlayerBody.BodyType = BodyType.Dynamic;
             player.PlayerBody.OnCollision += PlayerCollision;
             player.PlayerBody.Tag = _player;

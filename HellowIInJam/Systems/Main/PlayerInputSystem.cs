@@ -212,7 +212,7 @@ namespace HellowIInJam.Systems.Main
             #region Timer
             if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
             // 4 sekunden
-            if (player.werwolfTimer > 400000)
+            if (player.werwolfTimer > 4000)
             {
                 player.werwolfTimer = 0;
                 if (player.Demonized < 3) player.Demonized++;

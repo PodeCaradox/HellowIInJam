@@ -11,7 +11,9 @@ namespace CastleSim.Json
         public int[] MapTiles { get; set; }
         public int[] ObjectLayer { get; set; }
 
-    
+        public int[] Enemys { get; set; }
+
+
 
 
     }

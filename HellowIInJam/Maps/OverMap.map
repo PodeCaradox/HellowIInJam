@@ -1,0 +1,28 @@
+{
+  "ID": 0,
+  "Name": "Dummy",
+  "Size": {
+    "X": 4,
+    "Y": 4
+  },
+  "MapTiles": [
+    0,
+    4,
+    4,
+    1,
+    6,
+    8,
+    8,
+    5,
+    6,
+    8,
+    8,
+    5,
+    2,
+    7,
+    7,
+    3
+  ],
+  "ObjectLayer": null,
+  "Enemys": null
+}
