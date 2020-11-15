@@ -46,7 +46,7 @@ namespace CastleSim.Systems.HelperClasses
                 TextureSheet = mapTexture,
             });
 
-
+            Random r = new Random();
             var chunks = new Entity[mapData.Size.X  * mapData.Size.Y];
             
             var rooms = world.GetEntities().With<RoomPrefab>().AsSet().GetEntities();
@@ -77,12 +77,39 @@ namespace CastleSim.Systems.HelperClasses
                             {
                                 int key = yO * gameConfig.ChunkSize + xO;
                                 tiles[key] = world.CreateEntity();
+                                var pos = new Vector2(x * gameConfig.TileSize.X * gameConfig.ChunkSize + xO * gameConfig.TileSize.X, y * gameConfig.TileSize.Y * gameConfig.ChunkSize + yO * gameConfig.TileSize.Y);
                                 tiles[key].Set(new MapTile()
                                 {
-                                    Position = new Vector2(x * gameConfig.TileSize.X * gameConfig.ChunkSize + xO * gameConfig.TileSize.X, y * gameConfig.TileSize.Y * gameConfig.ChunkSize + yO * gameConfig.TileSize.Y),
+                                    Position = pos,
                                     TileID = room.Tiles[yO * gameConfig.ChunkSize + xO]
                                 });
 
+                                if (room.Tiles[yO * gameConfig.ChunkSize + xO] == 5)
+                                {
+                                    tiles[key].Set<Trap>();
+                                    var collision = physicsWord.CreateRectangle(16, 16, 1f, pos);
+                                    collision.BodyType = BodyType.Static;
+                                    collision.Mass = 1000;
+                                    collision.SleepingAllowed = true;
+                                    collision.Tag = tiles[key];
+                                    tiles[key].Set(new AnimatedTile() { 
+                                    ActualAnimation = 5,
+                                    Delay = 80,
+                                    WaitingTimeFirstAnimation = r.Next(2050,4000),
+                                    IDS = new int[] {5,6,7,8,9 }
+                                    });
+                                }
+
+
+                                if (room.Tiles[yO * gameConfig.ChunkSize + xO] == 4) 
+                                {
+                                    var collision = physicsWord.CreateRectangle(16 - 12, 12 - 10, 1f, pos + new Vector2(6,4));
+                                    collision.BodyType = BodyType.Static;
+                                    collision.Mass = 1000;
+                                    collision.SleepingAllowed = true;
+                                    collision.Tag = tiles[key];
+                                    tiles[key].Set<Pit>(); 
+                                }
 
 
                                 tiles[key].SetSameAs<TextureShared>(dummy);
@@ -95,7 +122,6 @@ namespace CastleSim.Systems.HelperClasses
 
                                         var collision = physicsWord.CreateRectangle(16, 16, 1f, new Vector2(x * gameConfig.TileSize.X * gameConfig.ChunkSize + xO * gameConfig.TileSize.X, y * gameConfig.TileSize.Y * gameConfig.ChunkSize + yO * gameConfig.TileSize.Y));
                                         collision.BodyType = BodyType.Static;
-                                    collision.IgnoreCCD = true;
                                         collision.Mass = 1000;
                                     collision.SleepingAllowed = true;
                                    
@@ -127,7 +153,8 @@ namespace CastleSim.Systems.HelperClasses
                         Tiles = tiles,
                         GameObjects = gameObjects,
                         Doors = doors,
-                        Enemys = new List<Entity>()
+                        Enemys = new List<Entity>(),
+                        Pots = new List<Entity>(),
                     });
                     
                   
@@ -245,7 +272,7 @@ namespace CastleSim.Systems.HelperClasses
             map.Name = mapName;
 
             map.ID = 0;
-            map.Size = new Point(4,4);
+            map.Size = new Point(10,10);
             map.MapTiles = new int[map.Size.X * map.Size.Y];
 
            

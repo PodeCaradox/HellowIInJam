@@ -48,21 +48,39 @@ namespace HellowIInJam.Helper.Main
                 }
 
                 Vector2 startPosie = mapData.Chunks[after].Get<Room>().Tiles[22].Get<MapTile>().Position;
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 1; i++)
                 {
 
-                    var enemy = mapData.Enemys[i % 2].CopyTo(_world);
-                    enemy.Enable();
-                    ref var gameObject = ref enemy.Get<GameObject>();
-                    var posi = startPosie + new Vector2(20,60);
-                    gameObject.LayerDepth = PosTransformer.ScreenToDepth(posi);
-                    var dummy = _physicsWorld.CreateRectangle(4, 20, 1f, posi);
-                    dummy.BodyType = BodyType.Dynamic;
-                    dummy.Mass = 100;
-                    dummy.Tag = enemy;
-                    gameObject.PlayerBody = dummy;
+                    if (2 == 2)
+                    {
+                        var enemy = mapData.Enemys[2].CopyTo(_world);
+                        enemy.Enable();
+                        ref var gameObject = ref enemy.Get<GameObject>();
+                        var posi = startPosie + new Vector2(20, 60);
+                        gameObject.LayerDepth = PosTransformer.ScreenToDepth(posi);
+                        var dummy = _physicsWorld.CreateRectangle(16, 16, 1f, posi);
+                        dummy.BodyType = BodyType.Static;
+                        dummy.Mass = 100;
+                        dummy.Tag = enemy;
+                        gameObject.PlayerBody = dummy;
+                        mapData.Chunks[after].Get<Room>().Pots.Add(enemy);
+                    }
+                    else
+                    {
+                        var enemy = mapData.Enemys[2].CopyTo(_world);
+                        enemy.Enable();
+                        ref var gameObject = ref enemy.Get<GameObject>();
+                        var posi = startPosie + new Vector2(20, 60);
+                        gameObject.LayerDepth = PosTransformer.ScreenToDepth(posi);
+                        var dummy = _physicsWorld.CreateRectangle(4, 20, 1f, posi);
+                        dummy.BodyType = BodyType.Dynamic;
+                        dummy.Mass = 100;
+                        dummy.Tag = enemy;
+                        gameObject.PlayerBody = dummy;
 
-                    mapData.Chunks[after].Get<Room>().Enemys.Add(enemy);
+                        mapData.Chunks[after].Get<Room>().Enemys.Add(enemy);
+                    }
+                   
                 }
             }
            

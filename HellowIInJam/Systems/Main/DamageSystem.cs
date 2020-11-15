@@ -34,8 +34,34 @@ namespace HellowIInJam.Systems.Main
             ref var player = ref entity.Get<Player>();
             damage.time += elaspedTime;
             damage.damageShown += elaspedTime;
+            ref var animated = ref entity.Get<Animated>();
+            if (player.playerLives == 0) {
+                if (animated.EndReached)
+                {
+                    entity.Disable();
+                }
+                return;
+            } 
+            player.playerLives--;
+           
+            if (player.playerLives == 0 && animated.Direction != Animated.Directions.Die)
+            {
+                entity.Get<GameObject>().PlayerBody.BodyType = tainicom.Aether.Physics2D.Dynamics.BodyType.Static;
+                player.Color = Color.White;
+                animated.ActualAnimationIndex = 0;
+                animated.ActualDelay = 0;
+                
+                animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Die.ToString() + player.Demonized);
+                if (player.Transformed) { 
+                    animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Die.ToString() + 3);
+                    player.Color = Color.White;
+                }
+                animated.Direction = Animated.Directions.Die;
+                animated.EndReached = false;
+                return;
+            }
 
-
+            
 
             if (damage.damageShown > 200)
             {

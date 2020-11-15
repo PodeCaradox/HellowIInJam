@@ -8,9 +8,11 @@ namespace HellowIInJam.Components.Map
     public struct AnimatedTile
     {
         public int ID;
-        public Point[] Sources;
+        public int[] IDS;
         public float Delay;
         public int ActualAnimation;
         public float ActualDelay;
+
+        public int WaitingTimeFirstAnimation;
     }
 }

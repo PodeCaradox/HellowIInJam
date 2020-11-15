@@ -18,14 +18,10 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using NAudio.Wave;
-using SoundTouch;
 using System;
 using System.IO;
 using System.Threading;
-using SoundTouch.Net.NAudioSupport;
 using HellowIInJam.Components.Sound;
-using HellowIInJam.CustomClasses;
 using System.Collections.Generic;
 using SharpMath2;
 using HellowIInJam.Helper.Main;
@@ -70,12 +66,12 @@ namespace HellowIInJam
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-           
+
         }
 
         protected override void Initialize()
         {
-            
+
 
             // TODO: Add your initialization logic here
             _graphics.GraphicsProfile = GraphicsProfile.Reach;
@@ -99,7 +95,7 @@ namespace HellowIInJam
             _world = new World();
             _physicsWord = new tainicom.Aether.Physics2D.Dynamics.World();
             _physicsWord.Gravity = Vector2.Zero;
-            
+
 
 
             InitEntitys();
@@ -127,9 +123,9 @@ namespace HellowIInJam
 
         private void InitSystems()
         {
-            mainSystems = new SequentialSystem<float>(new ChangeRoomSystem(_world),new PlayerInputSystem(_world), new CameraSystem(_world), new MapSystem(_world), new AnimationSystem(_world),new MoveObjectSystem(_world),new OpenDoorsSystem(_world),new DamageSystem(_world));;
+            mainSystems = new SequentialSystem<float>(new ChangeRoomSystem(_world), new PlayerInputSystem(_world), new CameraSystem(_world), new MapSystem(_world), new AnimationSystem(_world), new MoveObjectSystem(_world), new OpenDoorsSystem(_world), new FollowPlayerSystem(_world), new DamageSystem(_world), new TileAnimationSystem(_world)); ; ;
             drawSystems = new SequentialSystem<float>(new DrawMapSystem(_spriteBatch, _world));
-            darknessSystem = new DrawDarkness(_spriteBatch, _world,Content);
+            darknessSystem = new DrawDarkness(_spriteBatch, _world, Content);
         }
 
         private void InitStaticClasses()
@@ -137,7 +133,7 @@ namespace HellowIInJam
 
             CameraHelper.Init(_world);
             PosTransformer.Init(_world);
-            ChunkHelper.Init(_world,_physicsWord);
+            ChunkHelper.Init(_world, _physicsWord);
             //MapHelper.Init(_world);
         }
 
@@ -178,14 +174,14 @@ namespace HellowIInJam
             _player.Set(new GameObject()
             {
                 SourceRect = new Rectangle(0, 0, 16, 32),
-                
+
             });
 
             _player.Set(new Collision()
             {
                 CollisionRect = ShapeUtils.CreateRectangle(16, 16)
             });
-          
+
 
 
             _player.Set(new Player()
@@ -193,7 +189,8 @@ namespace HellowIInJam
                 Color = Color.White,
                 ChunkBefore = -1,
                 Speed = 600000f,
-                MaxSpeed = 200
+                MaxSpeed = 200,
+                playerLives = 1
             });
             _player.Set(new TextureShared
             {
@@ -269,7 +266,36 @@ namespace HellowIInJam
                 dummy.Add(Animated.Directions.Right.ToString() + lvl, (Point[])sources.Clone());
                 for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
             }
-           
+
+            sources = new Point[]{
+                   new Point(0, 384),
+                   new Point(16, 384),
+                   new Point(32, 384),
+                   new Point(48, 384),
+                   new Point(64, 384),
+                   new Point(80, 384),
+                   new Point(96, 384),
+                   new Point(112, 384),
+                   new Point(128, 384),
+                   new Point(144, 384),
+                   new Point(160, 384),
+                   new Point(176, 384),
+                   new Point(192, 384),
+                   new Point(208, 384),
+                   new Point(224, 384),
+               };
+
+
+            dummy.Add(Animated.Directions.Die.ToString() + 0, (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dummy.Add(Animated.Directions.Die.ToString() + 1, (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dummy.Add(Animated.Directions.Die.ToString() + 2, (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+            dummy.Add(Animated.Directions.Die.ToString() + 3, (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+
+
 
             sources = new Point[]{
                    new Point(0,0),
@@ -292,12 +318,21 @@ namespace HellowIInJam
 
             #endregion
 
-         
+
 
             #region Sound
 
+            var audioFile = Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "BgLoop").CreateInstance();
+            var dict = new Dictionary<String, SoundEffectInstance>();
+            dict.Add("BackgroundNormal", audioFile);
             _sound = _world.CreateEntity();
-            _sound.Set(new Sound());
+            _sound.Set(new Sound()
+            {
+                Instances = dict
+            });
+
+            // audioFile.IsLooped = true;
+            // audioFile.Play();
             #endregion
 
             #region Generate Dungeons and Map
@@ -342,15 +377,16 @@ namespace HellowIInJam
 
 
             MapHelper.LoadRooms(_world);
-            MapHelper.SaveMap("Dummy");
+           
              */
             #endregion
+            //MapHelper.SaveMap("OverMap");
             MapHelper.LoadRooms(_world);
-            MapHelper.LoadMap("OverMap", _world, Content,_physicsWord);
+            MapHelper.LoadMap("OverMap", _world, Content, _physicsWord);
 
-          
 
-      
+
+
         }
 
         protected override void LoadContent()
@@ -363,30 +399,18 @@ namespace HellowIInJam
             _viniette = Content.Load<Texture2D>("venen");
             scale = GraphicsDevice.PresentationParameters.BackBufferWidth / _viniette.Width;
 
-            var audioFile = new WaveFileReader(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Content" + Path.DirectorySeparatorChar + "BgLoop.wav");
 
 
 
-            var test = new LoopStream(audioFile) { };
 
+           
 
-            var processorStream = new SoundTouchWaveStream(test);
-
-            var waveOut = new WaveOut() {  };
-          
-
-            waveOut.Init(processorStream);
-            //waveOut.Play();
-
-            ref var sound = ref _sound.Get<Sound>();
-            sound.ProcessorStream = processorStream;
-            sound.WaveOut = waveOut;
 
 
         }
 
-     
-       
+
+
 
         private void ResetStates()
         {
@@ -397,19 +421,19 @@ namespace HellowIInJam
             camera.CameraPosition = new Vector2(_graphics.GraphicsDevice.Viewport.Bounds.Width / 2 + 100, _graphics.GraphicsDevice.Viewport.Bounds.Height / 2);
 
             ref var player = ref _player.Get<GameObject>();
-            player.PlayerBody = _physicsWord.CreateRectangle(8, 10, 1f, new Vector2(150, 150));
+            player.PlayerBody = _physicsWord.CreateRectangle(8, 8, 1f, new Vector2(150, 150));
             player.PlayerBody.BodyType = BodyType.Dynamic;
             player.PlayerBody.OnCollision += PlayerCollision;
             player.PlayerBody.Tag = _player;
             player.PlayerBody.LinearDamping = 8;
             player.PlayerBody.AngularDamping = 8;
-            player.Offset = new Vector2(0,12);
+            player.Offset = new Vector2(4, 18);
             // Give it some bounce and friction
 
             player.LayerDepth = PosTransformer.ScreenToDepth(player.PlayerBody.Position);
-            
+
             #region Enemys
-            
+
             var test = _world.CreateEntity();
             Random r = new Random();
             test.Set(new TextureShared
@@ -418,18 +442,18 @@ namespace HellowIInJam
             }
                );
             var dict = InitEnemyAnimationsZombie();
-            var dict1 = InitEnemyAnimationsMummy();
+            
             map.Enemys = new List<Entity>();
-
+            //0
             #region Zombie
-            Vector2 posi = new Vector2(-100,-400);
+            Vector2 posi = new Vector2(-100, -400);
 
 
             var _enemy = _world.CreateEntity();
             map.Enemys.Add(_enemy);
             _enemy.Disable();
             _enemy.Set<Enemy>();
-            
+
             _enemy.Set(new GameObject()
             {
                 LayerDepth = 0,
@@ -450,12 +474,14 @@ namespace HellowIInJam
 
             _enemy.SetSameAs<TextureShared>(test);
 
-            
+
             #endregion
 
+            var dict1 = InitEnemyAnimationsMummy();
+            //1
             #region Mumie
 
-            Vector2 posi1 = new Vector2(-100,-100);
+            Vector2 posi1 = new Vector2(-100, -100);
             var dummy1 = _physicsWord.CreateRectangle(4, 20, 1f, posi);
             dummy1.BodyType = BodyType.Dynamic;
             dummy1.Mass = 100;
@@ -464,7 +490,7 @@ namespace HellowIInJam
             map.Enemys.Add(_enemy1);
             _enemy1.Disable();
             _enemy1.Set<Enemy>();
-            
+
             _enemy1.Set(new GameObject()
             {
                 LayerDepth = 0,
@@ -488,11 +514,46 @@ namespace HellowIInJam
 
             _enemy1.SetSameAs<TextureShared>(test);
 
-          
+
 
             #endregion
 
-            
+            var dict2 = InitAnimationsPot();
+            //2
+            #region Pot
+
+            Vector2 posi2 = new Vector2(-100, -100);
+            var dummy2 = _physicsWord.CreateRectangle(16, 16, 1f, posi);
+            dummy2.BodyType = BodyType.Static;
+            dummy2.Mass = 100;
+
+            var _enemy2 = _world.CreateEntity();
+            map.Enemys.Add(_enemy2);
+            _enemy2.Disable();
+
+            _enemy2.Set(new GameObject()
+            {
+                LayerDepth = 0,
+                PlayerBody = null,
+                SourceRect = new Rectangle(0, 0, 16, 16)
+            });
+
+            _enemy2.Set<Pot>();
+
+            _enemy2.Set(new Animated()
+            {
+                Animations = dict2,
+                Sources = dict2.GetValueOrDefault(Animated.Directions.Idle.ToString()),
+
+                MaxDelayAnimation = 90,
+            });
+
+
+            _enemy2.SetSameAs<TextureShared>(test);
+
+            #endregion
+
+
 
 
             test.Dispose();
@@ -501,6 +562,21 @@ namespace HellowIInJam
 
             #endregion
 
+        }
+
+        private Dictionary<String, Point[]> InitAnimationsPot()
+        {
+            var dict = new Dictionary<String, Point[]>();
+            var sources = new Point[]{
+                   new Point(0,160),
+                   new Point(16, 160),
+                   new Point(32, 160),
+                   new Point(48, 160),
+                   new Point(64, 160),
+                   new Point(80, 160),
+               };
+            dict.Add(Animated.Directions.Idle.ToString(), sources);
+            return dict;
         }
 
         private Dictionary<String, Point[]> InitEnemyAnimationsZombie()
@@ -524,11 +600,27 @@ namespace HellowIInJam
             for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
             dict.Add(Animated.Directions.Right.ToString(), (Point[])sources.Clone());
             for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+
+            sources = new Point[]{
+                   new Point(0,128),
+                   new Point(16, 128),
+                   new Point(32, 128),
+                   new Point(48, 128),
+                   new Point(64, 128),
+                   new Point(80, 128),
+                   new Point(96, 128),
+                   new Point(112, 128),
+                   new Point(128, 128),
+               };
+            dict.Add(Animated.Directions.Die.ToString(), (Point[])sources.Clone());
+
+
             return dict;
         }
 
         private bool PlayerCollision(Fixture sender, Fixture other, Contact contact)
         {
+           
             if (sender.Body.Tag == null && other.Body.Tag == null) return true;
 
             if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Door>())
@@ -542,24 +634,60 @@ namespace HellowIInJam
                     });
                 }
 
-            }else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Enemy>())
+            }
+            else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Enemy>())
             {
                 Entity player = (Entity)sender.Body.Tag;
-                player.Get<Player>().Color = Color.Red;
+                if (player.Get<Player>().isAttacking) return true;
+                if (player.Get<Player>().Transformed)
+                    player.Get<Player>().Color = Color.Red;
 
 
                 if (player.Has<Damage>()) return true;
-                
+
                 player.Set(new Damage()
                 {
-                    
+
                 });
+            }
+            else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Pit>())
+            {
+                Entity player = (Entity)sender.Body.Tag;
+                if (player.Get<Player>().isAttacking) return true;
+               
+                    player.Get<Player>().playerLives = 1;
+
+
+               
+
+                player.Set(new Damage()
+                {
+
+                });
+            }
+            else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Trap>())
+            {
+                Entity player = (Entity)sender.Body.Tag;
+                Entity trap = (Entity)other.Body.Tag;
+                if (!trap.Get<Trap>().Activ) return false;
+                player.Set(new Damage()
+                {
+
+                });
+            }
+            else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Pot>())
+            {
+                Entity player = (Entity)sender.Body.Tag;
+                Entity pot = (Entity)other.Body.Tag;
+                _physicsWord.RemoveAsync(other.Body);
+                pot.Disable();
+                player.Get<Player>().Demonized = 0;
             }
             return true;
 
         }
 
-        private Dictionary<String,Point[]> InitEnemyAnimationsMummy()
+        private Dictionary<String, Point[]> InitEnemyAnimationsMummy()
         {
             var dict = new Dictionary<String, Point[]>();
             var sources = new Point[]{
@@ -580,6 +708,20 @@ namespace HellowIInJam
             for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
             dict.Add(Animated.Directions.Right.ToString(), (Point[])sources.Clone());
             for (int i = 0; i < sources.Length; i++) sources[i].Y += 32;
+
+
+            sources = new Point[]{
+                   new Point(144,128),
+                   new Point(144 + 16, 128),
+                   new Point(144 + 32, 128),
+                   new Point(144 + 48, 128),
+                   new Point(144 + 64, 128),
+                   new Point(144 + 80, 128),
+                   new Point(144 + 96, 128),
+                   new Point(144 + 112, 128),
+                   new Point(144 + 128, 128),
+               };
+            dict.Add(Animated.Directions.Die.ToString(), (Point[])sources.Clone());
             return dict;
         }
 
@@ -602,36 +744,37 @@ namespace HellowIInJam
 
         protected override void Draw(GameTime gameTime)
         {
-            
+
 
 
             GraphicsDevice.SetRenderTarget(game);
             GraphicsDevice.Clear(Color.Black);
             drawSystems.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
-           
+
             GraphicsDevice.SetRenderTarget(light);
-         
-            GraphicsDevice.Clear((_player.Get<Player>().Transformed && _player.Get<Player>().Demonized>0) ?Color.Black:new Color(255,255,255, 128));
+
+            GraphicsDevice.Clear((_player.Get<Player>().Transformed && _player.Get<Player>().Demonized > 0) ? Color.Black : new Color(255, 255, 255, 128));
             darknessSystem.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
-            
+
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.Black);
             LightEffect.Parameters["LightMask"].SetValue(light);
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-         
+
 
             LightEffect.CurrentTechnique.Passes[0].Apply();
             _spriteBatch.Draw(game, Vector2.Zero, Color.White);
 
-            
-           
+
+
 
             _spriteBatch.End();
 
             if (_player.Get<Player>().Demonized == 3)
             {
+                /*
                 timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 
                 if (timer > 50)
@@ -640,22 +783,22 @@ namespace HellowIInJam
                     {
                         timer = 0;
                     }
-                
-                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,samplerState: SS_PointBorder);
+                */
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState: SS_PointBorder);
 
 
 
-                    _spriteBatch.Draw(_viniette, Vector2.Zero, new Rectangle(0, 0, _viniette.Width, _viniette.Height), Color.White, 0, Vector2.Zero, scale: scale, SpriteEffects.None, 1f);
+                _spriteBatch.Draw(_viniette, Vector2.Zero, new Rectangle(0, 0, _viniette.Width, _viniette.Height), Color.White, 0, Vector2.Zero, scale: scale, SpriteEffects.None, 1f);
 
 
 
 
-                    _spriteBatch.End();
-                }
+                _spriteBatch.End();
+                //}
             }
-            
 
-            
+
+
 
             base.Draw(gameTime);
         }

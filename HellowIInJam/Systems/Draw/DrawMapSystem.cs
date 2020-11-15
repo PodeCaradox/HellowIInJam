@@ -92,10 +92,32 @@ namespace CastleSim.Systems
 
             }
 
-            ref GameObject gameObject1 = ref _player.Get<GameObject>();
-            ref TextureShared texture1 = ref _player.Get<TextureShared>();
-            ref Player player = ref _player.Get<Player>();
-            _batch.Draw(texture: texture1.TextureSheet, position: gameObject1.PlayerBody.Position - gameObject1.Offset + gameObject1.AnimationOffset, gameObject1.SourceRect, color: player.Color, 0, Vector2.Zero, 1, SpriteEffects.None, layerDepth: gameObject1.LayerDepth);
+            for (int i = 0; i < map.ChunksToDraw; i++)
+            {
+                ref var room = ref map.ToDraw[i].Get<Room>();
+                for (int index = 0; index < room.Pots.Count; index++)
+                {
+                    if (!room.Pots[index].IsEnabled()) continue;
+                    ref GameObject gameObject = ref room.Pots[index].Get<GameObject>();
+                    ref TextureShared texture = ref room.Pots[index].Get<TextureShared>();
+
+
+
+
+                    _batch.Draw(texture: texture.TextureSheet, position: gameObject.PlayerBody.Position - gameObject.Offset, gameObject.SourceRect, color: Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, layerDepth: gameObject.LayerDepth);
+
+                }
+
+            }
+
+            if (_player.IsEnabled())
+            {
+                ref GameObject gameObject1 = ref _player.Get<GameObject>();
+                ref TextureShared texture1 = ref _player.Get<TextureShared>();
+                ref Player player = ref _player.Get<Player>();
+                _batch.Draw(texture: texture1.TextureSheet, position: gameObject1.PlayerBody.Position - gameObject1.Offset + gameObject1.AnimationOffset, gameObject1.SourceRect, color: player.Color, 0, Vector2.Zero, 1, SpriteEffects.None, layerDepth: gameObject1.LayerDepth);
+
+            }
 
 
             _batch.End();

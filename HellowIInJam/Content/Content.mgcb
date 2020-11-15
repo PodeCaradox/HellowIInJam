@@ -13,9 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin BgLoop.wav
-/copy:BgLoop.wav
-
 #begin dummy.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -69,6 +66,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:player.png
+
+#begin Sounds/BgLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/BgLoop.wav
 
 #begin venen.png
 /importer:TextureImporter

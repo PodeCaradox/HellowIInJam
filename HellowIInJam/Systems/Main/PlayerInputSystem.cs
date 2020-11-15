@@ -37,13 +37,15 @@ namespace HellowIInJam.Systems.Main
             ref var gameObject = ref entity.Get<GameObject>();
             ref var player = ref entity.Get<Player>();
             ref var animated = ref entity.Get<Animated>();
-            
-            KeyboardState keyboard = Keyboard.GetState();
+
+            if (player.playerLives == 0) return;
+
+                KeyboardState keyboard = Keyboard.GetState();
             MouseState mouse = Mouse.GetState();
             gameObject.PlayerBody.LinearVelocity = new Vector2(0, 0);
             Vector2 force = Vector2.Zero;
             bool moved = false;
-            bool isAttacking = false;
+            player.isAttacking = false;
             if (animated.Direction != Animated.Directions.AttackLeft &&
                 animated.Direction != Animated.Directions.AttackRight &&
                 animated.Direction != Animated.Directions.AttackDown &&
@@ -134,7 +136,7 @@ namespace HellowIInJam.Systems.Main
             else
             {
                 int range = 10;
-                isAttacking = true;
+                player.isAttacking = true;
                 if (animated.Direction == Animated.Directions.AttackDown)
                 {
                     var dummy = gameObject.PlayerBody.Position + new Vector2(0, 10);// new Vector2(8, 10)
@@ -212,7 +214,7 @@ namespace HellowIInJam.Systems.Main
             #region Timer
             if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
             // 4 sekunden
-            if (player.werwolfTimer > 4000)
+            if (player.werwolfTimer > 1000)
             {
                 player.werwolfTimer = 0;
                 if (player.Demonized < 3) player.Demonized++;
@@ -229,7 +231,7 @@ namespace HellowIInJam.Systems.Main
             if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F))
             {
                 
-                if (player.Demonized != 3 && !isAttacking) {
+                if (player.Demonized != 3 && !player.isAttacking) {
                     player.Transformed = !player.Transformed;
 
                     if (!player.Transformed)
@@ -258,7 +260,7 @@ namespace HellowIInJam.Systems.Main
            
             keyboardStateBefore = keyboard;
 
-            if (isAttacking)
+            if (player.isAttacking)
             {
                 if (ChunkHelper.AllDead(chunk))
                 {
@@ -273,8 +275,16 @@ namespace HellowIInJam.Systems.Main
             {
                 if (((Entity)fixture.Body.Tag).Has<Enemy>())
                 {
+                    var entity = ((Entity)fixture.Body.Tag);
+                    fixture.Body.IgnoreCCD = true;
                     fixture.Body.World.Remove(fixture.Body);
-                    ((Entity)fixture.Body.Tag).Disable();
+                    ref var animation = ref entity.Get<Animated>();
+                    if (entity.Has<MoveAndSlide>()) entity.Remove<MoveAndSlide>();
+                    if (entity.Has<FollowPlayer>()) entity.Remove<FollowPlayer>();
+                    animation.ActualAnimationIndex = 0;
+                    animation.ActualDelay = 0;
+                    animation.Direction = Animated.Directions.Die;
+                    animation.Sources = animation.Animations.GetValueOrDefault(Animated.Directions.Die.ToString());
                 }
             }
             return true;

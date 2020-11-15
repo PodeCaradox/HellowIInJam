@@ -18,5 +18,7 @@ namespace HellowIInJam.Components.Objects.Player
         public bool Invertiert;
         public Color Color;
         public float werwolfTimer;
+        public int playerLives;
+        internal bool isAttacking;
     }
 }
