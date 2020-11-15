@@ -37,9 +37,10 @@ namespace HellowIInJam.Systems.Main
             ref var gameObject = ref entity.Get<GameObject>();
             ref var player = ref entity.Get<Player>();
             ref var animated = ref entity.Get<Animated>();
-
+            gameObject.keinSound += elaspedTime;
             if (player.playerLives == 0) return;
 
+            player.JumpCD += elaspedTime;
                 KeyboardState keyboard = Keyboard.GetState();
             MouseState mouse = Mouse.GetState();
             gameObject.PlayerBody.LinearVelocity = new Vector2(0, 0);
@@ -59,14 +60,14 @@ namespace HellowIInJam.Systems.Main
                     moved = true;
 
                     CheckAnimation(Animated.Directions.Up, ref animated, player.Transformed, player.Demonized);
-
+                    
                 }
                 else if ((keyboard.IsKeyDown(Keys.S) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.W) && player.Invertiert && player.Transformed))
                 {
                     force = new Vector2(0, player.Speed);
                     moved = true;
                     CheckAnimation(Animated.Directions.Down, ref animated, player.Transformed, player.Demonized);
-
+                   
                 }
 
 
@@ -75,19 +76,34 @@ namespace HellowIInJam.Systems.Main
                     moved = true;
                     force = new Vector2(player.Speed, 0);
                     CheckAnimation(Animated.Directions.Right, ref animated, player.Transformed, player.Demonized);
-
+                    
                 }
                 else if ((keyboard.IsKeyDown(Keys.A) && (!player.Invertiert || !player.Transformed)) || (keyboard.IsKeyDown(Keys.D) && player.Invertiert && player.Transformed))
                 {
                     moved = true;
                     force = new Vector2(-player.Speed, 0);
                     CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed, player.Demonized);
+                   
+                }
+                /*
+                if (keyboard.IsKeyDown(Keys.Space) && keyboardStateBefore.IsKeyUp(Keys.Space) && player.JumpCD > 1000)
+                {
+                    player.JumpCD = 0;
+                    var dummy = force;
+                    dummy.Normalize();
+                    gameObject.PlayerBody.LinearVelocity += dummy * 10000000;
+
 
                 }
-
+                */
                 #region Idle
-                if (!moved)
+                if (moved)
                 {
+                    if (gameObject.keinSound > 500)
+                    {
+                        SoundHelper.PlaySound("Sandlaufeffekt");
+                        gameObject.keinSound = 0;
+                    }
                     //CheckAnimation(Animated.Directions.Left, ref animated, player.Transformed, player.Demonized);
                 }
                 #endregion
@@ -165,7 +181,7 @@ namespace HellowIInJam.Systems.Main
                 {
                     if (animated.Direction == Animated.Directions.AttackDown)
                     {
-                        force = new Vector2(0, player.Speed * 10);
+                        force *= new Vector2(0, player.Speed * 10);
                     }
                     else if (animated.Direction == Animated.Directions.AttackTop)
                     {
@@ -214,13 +230,15 @@ namespace HellowIInJam.Systems.Main
             #region Timer
             if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
             // 4 sekunden
-            if (player.werwolfTimer > 1000)
+            if (player.werwolfTimer > 5000)
             {
                 player.werwolfTimer = 0;
                 if (player.Demonized < 3) player.Demonized++;
                 if (!player.Transformed)
                     if (player.Demonized == 2) player.Invertiert = true;
-                if (player.Demonized == 3) player.Transformed = true;
+               
+                ref var sound = ref _sound.Get<Sound>();
+                SoundHelper.ChangeBackgroundMusic("Monster Mode " + player.Demonized);
             }
             #endregion
 
@@ -231,13 +249,26 @@ namespace HellowIInJam.Systems.Main
             if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F))
             {
                 
-                if (player.Demonized != 3 && !player.isAttacking) {
+                if ( !player.isAttacking) {
                     player.Transformed = !player.Transformed;
 
+                    if (player.Transformed) SoundHelper.PlaySound("Verwandlung");
                     if (!player.Transformed)
                         if (player.Demonized == 2) player.Invertiert = true;
+                   
 
+                    if (player.Demonized!= 0)
+                    {
+                        SoundHelper.ChangeBackgroundMusic("Monster Mode " + player.Demonized);
+                       
+                    }
 
+                    if (!player.Transformed)
+                    {
+                        SoundHelper.ChangeBackgroundMusic("BgLoop");
+                    
+                    }
+                   
                     String dummy = animated.Direction.ToString() + ((player.Transformed) ? "_Wolf" : "") + ((!player.Transformed && player.Demonized > 0) ? player.Demonized.ToString() : "");
                     animated.Sources = animated.Animations.GetValueOrDefault(dummy);
 
@@ -254,20 +285,21 @@ namespace HellowIInJam.Systems.Main
             gameObject.LayerDepth = PosTransformer.ScreenToDepth(gameObject.PlayerBody.Position);
             var chunk = PosTransformer.ScreenToChunkKKey(gameObject.PlayerBody.Position);
             if(player.ChunkBefore != chunk)
-            ChunkHelper.ActivateLight(player.ChunkBefore, chunk);
-            player.ChunkBefore = chunk;
+                ChunkHelper.ActivateLight(player.ChunkBefore, chunk);
+                player.ChunkBefore = chunk;
 
            
             keyboardStateBefore = keyboard;
 
-            if (player.isAttacking)
-            {
+           
                 if (ChunkHelper.AllDead(chunk))
                 {
                     ChunkHelper.OpenDorrs(chunk);
                 }
-            }
+            
         }
+
+       
 
         private bool CallbackQuery(tainicom.Aether.Physics2D.Dynamics.Fixture fixture)
         {
@@ -276,6 +308,14 @@ namespace HellowIInJam.Systems.Main
                 if (((Entity)fixture.Body.Tag).Has<Enemy>())
                 {
                     var entity = ((Entity)fixture.Body.Tag);
+                    if (entity.Has<Anubis>())
+                    {
+                        entity.Get<Anubis>().Lives--;
+                        if (entity.Get<Anubis>().Lives > 0) return false;
+                    }
+
+                    SoundHelper.PlaySound("MonsterDying");
+                   
                     fixture.Body.IgnoreCCD = true;
                     fixture.Body.World.Remove(fixture.Body);
                     ref var animation = ref entity.Get<Animated>();

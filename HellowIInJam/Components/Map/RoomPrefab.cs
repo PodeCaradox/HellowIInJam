@@ -10,5 +10,6 @@ namespace HellowIInJam.Components.Map
         public int ID;
         public int[] Tiles;
         public int[] Objects;
+        internal int[] Enemys;
     }
 }

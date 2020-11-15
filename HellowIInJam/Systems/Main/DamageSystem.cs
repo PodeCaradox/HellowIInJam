@@ -1,7 +1,9 @@
 ﻿using DefaultEcs;
 using DefaultEcs.System;
+using HellowIInJam.Components.Map;
 using HellowIInJam.Components.Objects;
 using HellowIInJam.Components.Objects.Player;
+using HellowIInJam.Helper.Main;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,17 @@ namespace HellowIInJam.Systems.Main
             if (player.playerLives == 0) {
                 if (animated.EndReached)
                 {
-                    entity.Disable();
+                    animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Down.ToString());
+                    entity.Remove<Damage>();
+                    entity.Get<GameObject>().PlayerBody.BodyType = tainicom.Aether.Physics2D.Dynamics.BodyType.Dynamic;
+                    entity.Get<Player>().Color = Color.White;
+                    entity.Get<Player>().Demonized = 0;
+                    entity.Get<Player>().Invertiert = false;
+                    entity.Get<Player>().Transformed = false;
+                    entity.Get<Player>().werwolfTimer = 0;
+                    var room1 = _world.GetEntities().With<FirstRoom>().AsSet().GetEntities()[0];
+                    entity.Get<GameObject>().PlayerBody.Position = room1.Get<Room>().Tiles[350].Get<MapTile>().Position;
+                    player.playerLives = 1;
                 }
                 return;
             } 
@@ -46,6 +58,12 @@ namespace HellowIInJam.Systems.Main
            
             if (player.playerLives == 0 && animated.Direction != Animated.Directions.Die)
             {
+                if (!damage.SoundPlayed)
+                {
+                    if (player.Transformed) SoundHelper.PlaySound("PlayerDeath(Wolf)");
+                    else SoundHelper.PlaySound("PlayerDeath(Mensch)");
+                }
+                
                 entity.Get<GameObject>().PlayerBody.BodyType = tainicom.Aether.Physics2D.Dynamics.BodyType.Static;
                 player.Color = Color.White;
                 animated.ActualAnimationIndex = 0;
@@ -60,6 +78,8 @@ namespace HellowIInJam.Systems.Main
                 animated.EndReached = false;
                 return;
             }
+
+    
 
             
 

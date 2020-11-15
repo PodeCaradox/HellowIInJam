@@ -59,8 +59,9 @@ namespace HellowIInJam.Systems.Main
 
             player.PlayerBody.Position += directionPlayer;
             var after = PosTransformer.ScreenToChunkKKey(player.PlayerBody.Position);
-            ChunkHelper.ActivateLight(before, after);
-            playerData.ChunkBefore = before;
+            if(before != after)
+                ChunkHelper.ActivateLight(before, after);
+            playerData.ChunkBefore = after;
 
             entity.Remove<ChangeChunk>();
 

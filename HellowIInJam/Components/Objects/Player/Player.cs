@@ -20,5 +20,6 @@ namespace HellowIInJam.Components.Objects.Player
         public float werwolfTimer;
         public int playerLives;
         internal bool isAttacking;
+        public float JumpCD;
     }
 }

@@ -62,15 +62,18 @@ namespace CastleSim.Systems.HelperClasses
                     Entity[] tiles = null;
                     List<Entity> gameObjects = new List<Entity>();
                     List<Entity> doors = new List<Entity>();
+                    int[] enemys = null;
                     bool visible = false;
-
+                    bool first = false;
                     if (mapData.MapTiles[i] != -1)
                     {
                         visible = true;
                         tiles = new Entity[gameConfig.ChunkSize * gameConfig.ChunkSize];
 
                         ref var room = ref rooms[mapData.MapTiles[i]].Get<RoomPrefab>();
-
+                        if (mapData.MapTiles[i] == 0) first = true;
+                        else first = false;
+                         enemys = room.Enemys;
                         for (int yO = 0; yO < gameConfig.ChunkSize; yO++)
                         {
                             for (int xO = 0; xO < gameConfig.ChunkSize; xO++)
@@ -101,7 +104,7 @@ namespace CastleSim.Systems.HelperClasses
                                 }
 
 
-                                if (room.Tiles[yO * gameConfig.ChunkSize + xO] == 4) 
+                                if (room.Tiles[yO * gameConfig.ChunkSize + xO] == 4 || room.Tiles[yO * gameConfig.ChunkSize + xO] == 2) 
                                 {
                                     var collision = physicsWord.CreateRectangle(16 - 12, 12 - 10, 1f, pos + new Vector2(6,4));
                                     collision.BodyType = BodyType.Static;
@@ -153,9 +156,15 @@ namespace CastleSim.Systems.HelperClasses
                         Tiles = tiles,
                         GameObjects = gameObjects,
                         Doors = doors,
+                        Enemys1 = enemys,
                         Enemys = new List<Entity>(),
                         Pots = new List<Entity>(),
                     });
+
+                    if (first)
+                    {
+                        chunks[i].Set<FirstRoom>();
+                    }
                     
                   
 
@@ -468,7 +477,8 @@ namespace CastleSim.Systems.HelperClasses
                 {
                     ID = roomData.ID,
                     Tiles = roomData.MapTiles,
-                    Objects = roomData.ObjectLayer
+                    Objects = roomData.ObjectLayer,
+                    Enemys = roomData.Enemys
                 });
             }
            

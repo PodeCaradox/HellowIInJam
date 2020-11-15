@@ -8,5 +8,6 @@ namespace HellowIInJam.Components.Objects
     {
         public float time;
         public float damageShown;
+        public bool SoundPlayed;
     }
 }

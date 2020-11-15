@@ -7,5 +7,6 @@ namespace HellowIInJam.Components.Objects
     public struct Trap
     {
         public bool Activ;
+        public bool RoomActivated;
     }
 }

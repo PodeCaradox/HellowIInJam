@@ -13,6 +13,7 @@ namespace HellowIInJam.Components.Map
         public List<Entity> GameObjects;
         public List<Entity> Doors;
         public List<Entity> Enemys;
+        public int[] Enemys1;
         public bool Open;
 
         public List<Entity> Pots;

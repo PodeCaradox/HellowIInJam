@@ -12,7 +12,7 @@ namespace HellowIInJam.Components.Map
         public float Delay;
         public int ActualAnimation;
         public float ActualDelay;
-
+        public float SoundDelay;
         public int WaitingTimeFirstAnimation;
     }
 }

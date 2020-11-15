@@ -13,6 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Arial.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Arial.spritefont
+
 #begin dummy.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -67,11 +74,131 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
-#begin Sounds/BgLoop.wav
+#begin Sounds/AnubisAngriff.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/BgLoop.wav
+/build:Sounds/AnubisAngriff.wav
+
+#begin Sounds/AnubisDeath.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/AnubisDeath.wav
+
+#begin Sounds/AnubisIntro.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/AnubisIntro.wav
+
+#begin Sounds/BossFightLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/BossFightLoop.wav
+
+#begin Sounds/FightForMe.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/FightForMe.wav
+
+#begin Sounds/Level Geschafft.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Level Geschafft.wav
+
+#begin Sounds/LochFallebMensch.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/LochFallebMensch.wav
+
+#begin Sounds/LochFallenWerWolf.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/LochFallenWerWolf.wav
+
+#begin Sounds/MonsterAngriff.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/MonsterAngriff.wav
+
+#begin Sounds/MonsterDying.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/MonsterDying.wav
+
+#begin Sounds/MonsterNormal.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/MonsterNormal.wav
+
+#begin Sounds/Musik/BgLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Musik/BgLoop.wav
+
+#begin Sounds/Musik/Monster Mode 2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Musik/Monster Mode 2.wav
+
+#begin Sounds/Musik/Monster Mode 3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Musik/Monster Mode 3.wav
+
+#begin Sounds/Musik/Monster Mode.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Musik/Monster Mode.wav
+
+#begin Sounds/PlayerDeath(Mensch).wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerDeath(Mensch).wav
+
+#begin Sounds/PlayerDeath(Wolf).wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerDeath(Wolf).wav
+
+#begin Sounds/Sandlaufeffekt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Sandlaufeffekt.wav
+
+#begin Sounds/Schaden.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Schaden.wav
+
+#begin Sounds/Spikes.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Spikes.wav
+
+#begin Sounds/Verwandlung.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Verwandlung.wav
 
 #begin venen.png
 /importer:TextureImporter

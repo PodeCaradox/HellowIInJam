@@ -15,5 +15,6 @@ namespace HellowIInJam.Components.Objects
         public float LayerDepth;
         public Vector2 Velocity;
         public Vector2 AnimationOffset;
+        public float keinSound;
     }
 }

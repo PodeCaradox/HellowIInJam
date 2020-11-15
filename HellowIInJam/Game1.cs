@@ -48,7 +48,7 @@ namespace HellowIInJam
         private Entity _player;
         private Entity _sound;
         #endregion
-
+        private SpriteFont _font;
         private Texture2D _viniette;
 
         #region Systems
@@ -123,7 +123,7 @@ namespace HellowIInJam
 
         private void InitSystems()
         {
-            mainSystems = new SequentialSystem<float>(new ChangeRoomSystem(_world), new PlayerInputSystem(_world), new CameraSystem(_world), new MapSystem(_world), new AnimationSystem(_world), new MoveObjectSystem(_world), new OpenDoorsSystem(_world), new FollowPlayerSystem(_world), new DamageSystem(_world), new TileAnimationSystem(_world)); ; ;
+            mainSystems = new SequentialSystem<float>(new ChangeRoomSystem(_world), new PlayerInputSystem(_world), new CameraSystem(_world), new MapSystem(_world), new AnimationSystem(_world), new MoveObjectSystem(_world), new OpenDoorsSystem(_world), new FollowPlayerSystem(_world), new DamageSystem(_world), new TileAnimationSystem(_world),new BossBattleSystem(_world)); ; ;
             drawSystems = new SequentialSystem<float>(new DrawMapSystem(_spriteBatch, _world));
             darknessSystem = new DrawDarkness(_spriteBatch, _world, Content);
         }
@@ -134,6 +134,7 @@ namespace HellowIInJam
             CameraHelper.Init(_world);
             PosTransformer.Init(_world);
             ChunkHelper.Init(_world, _physicsWord);
+            SoundHelper.Init(_world);
             //MapHelper.Init(_world);
         }
 
@@ -190,7 +191,8 @@ namespace HellowIInJam
                 ChunkBefore = -1,
                 Speed = 600000f,
                 MaxSpeed = 200,
-                playerLives = 1
+                playerLives = 1,
+                JumpCD = 20000
             });
             _player.Set(new TextureShared
             {
@@ -322,13 +324,49 @@ namespace HellowIInJam
 
             #region Sound
 
-            var audioFile = Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "BgLoop").CreateInstance();
+
             var dict = new Dictionary<String, SoundEffectInstance>();
-            dict.Add("BackgroundNormal", audioFile);
+
+            #region Music
+
+            dict.Add("BgLoop", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Musik" + Path.DirectorySeparatorChar + "BgLoop").CreateInstance());
+            dict.Add("Monster Mode 1", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Musik" + Path.DirectorySeparatorChar + "Monster Mode").CreateInstance());
+            dict.Add("Monster Mode 2", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Musik" + Path.DirectorySeparatorChar + "Monster Mode 2").CreateInstance());
+            dict.Add("Monster Mode 3", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Musik" + Path.DirectorySeparatorChar + "Monster Mode 3").CreateInstance());
+
+            #endregion
+
+            #region Effects
+
+            dict.Add("AnubisAngriff", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "AnubisAngriff").CreateInstance());
+            dict.Add("AnubisDeath", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "AnubisDeath").CreateInstance());
+            dict.Add("AnubisIntro", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "AnubisIntro").CreateInstance());
+            dict.Add("BossFightLoop", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "BossFightLoop").CreateInstance());
+            dict.Add("FightForMe", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "FightForMe").CreateInstance());
+            dict.Add("Level Geschafft", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Level Geschafft").CreateInstance());
+            dict.Add("LochFallebMensch", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "LochFallebMensch").CreateInstance());
+            dict.Add("LochFallenWerWolf", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "LochFallenWerWolf").CreateInstance());
+            dict.Add("MonsterAngriff", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "MonsterAngriff").CreateInstance());
+            dict.Add("MonsterDying", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "MonsterDying").CreateInstance());
+            dict.Add("MonsterNormal", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "MonsterNormal").CreateInstance());
+            dict.Add("PlayerDeath(Mensch)", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "PlayerDeath(Mensch)").CreateInstance());
+            dict.Add("PlayerDeath(Wolf)", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "PlayerDeath(Wolf)").CreateInstance());
+            dict.Add("Sandlaufeffekt", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Sandlaufeffekt").CreateInstance());
+            dict.Add("Schaden", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Schaden").CreateInstance());
+            dict.Add("Spikes", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Spikes").CreateInstance());
+            dict.Add("Verwandlung", Content.Load<SoundEffect>("Sounds" + Path.DirectorySeparatorChar + "Verwandlung").CreateInstance());
+            #endregion
+
+            var sound = dict.GetValueOrDefault("BgLoop");
+            sound.IsLooped = true;
+            sound.Play();
+
+
             _sound = _world.CreateEntity();
             _sound.Set(new Sound()
             {
-                Instances = dict
+                Instances = dict,
+                ActivSong = sound
             });
 
             // audioFile.IsLooped = true;
@@ -338,49 +376,51 @@ namespace HellowIInJam
             #region Generate Dungeons and Map
 
 
+
+
             /*
-            
+           #region Corners
+           MapHelper.SaveRoom("Room" + 0, chunksize, left: false, down: true, right: true, up: false);
+           MapHelper.SaveRoom("Room" + 1, chunksize, left: true, down: true, right: false, up: false);
+           MapHelper.SaveRoom("Room" + 2, chunksize, left: false, down: false, right: true, up: true);
+           MapHelper.SaveRoom("Room" + 3, chunksize, left: true, down: false, right: false, up: true);
+           #endregion
 
-            #region Corners
-            MapHelper.SaveRoom("Room" + 0, chunksize, left: false, down: true, right: true, up: false);
-            MapHelper.SaveRoom("Room" + 1, chunksize, left: true, down: true, right: false, up: false);
-            MapHelper.SaveRoom("Room" + 2, chunksize, left: false, down: false, right: true, up: true);
-            MapHelper.SaveRoom("Room" + 3, chunksize, left: true, down: false, right: false, up: true);
-            #endregion
+           #region Walls
+           MapHelper.SaveRoom("Room" + 4, chunksize, left: true, down: true, right: true, up: false);
+           MapHelper.SaveRoom("Room" + 5, chunksize, left: true, down: true, right: false, up: true);
+           MapHelper.SaveRoom("Room" + 6, chunksize, left: false, down: true, right: true, up: true);
+           MapHelper.SaveRoom("Room" + 7, chunksize, left: true, down: false, right: true, up: true);
 
-            #region Walls
-            MapHelper.SaveRoom("Room" + 4, chunksize, left: true, down: true, right: true, up: false);
-            MapHelper.SaveRoom("Room" + 5, chunksize, left: true, down: true, right: false, up: true);
-            MapHelper.SaveRoom("Room" + 6, chunksize, left: false, down: true, right: true, up: true);
-            MapHelper.SaveRoom("Room" + 7, chunksize, left: true, down: false, right: true, up: true);
-
-            MapHelper.SaveRoom("Room" + 8, chunksize, left: true, down: true, right: true, up: true);
-            #endregion
+           MapHelper.SaveRoom("Room" + 8, chunksize, left: true, down: true, right: true, up: true);
+           #endregion
 
 
-            MapHelper.SaveRoom("Room" + "Up" , chunksize, left: false, down: false, right: false, up: true);
-            MapHelper.SaveRoom("Room" + "Right" , chunksize, left: false, down: false, right: true, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: false, right: true, up: true);
-            MapHelper.SaveRoom("Room" + "Down" , chunksize, left: false, down: true, right: false, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Down", chunksize, left: false, down: true, right: false, up: true);
-            MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: true, right: true, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down", chunksize, left: false, down: true, right: true, up: true);
-            MapHelper.SaveRoom("Room" + "Left", chunksize, left: true, down: false, right: false, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Left", chunksize, left: true, down: false, right: false, up: true);
-            MapHelper.SaveRoom("Room" + "Up" + "Right", chunksize, left: true, down: false, right: true, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Left", chunksize, left: true, down: false, right: true, up: true);
-            MapHelper.SaveRoom("Room" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: true);
-            MapHelper.SaveRoom("Room" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: false);
-            MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: true);
-
-
-
-            MapHelper.LoadRooms(_world);
            
-             */
+           MapHelper.SaveRoom("Room" + "Right" , chunksize, left: false, down: false, right: true, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: false, right: true, up: true);
+           MapHelper.SaveRoom("Room" + "Down" , chunksize, left: false, down: true, right: false, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Down", chunksize, left: false, down: true, right: false, up: true);
+           MapHelper.SaveRoom("Room" + "Up" + "Right" , chunksize, left: false, down: true, right: true, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down", chunksize, left: false, down: true, right: true, up: true);
+           MapHelper.SaveRoom("Room" + "Left", chunksize, left: true, down: false, right: false, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Left", chunksize, left: true, down: false, right: false, up: true);
+           MapHelper.SaveRoom("Room" + "Up" + "Right", chunksize, left: true, down: false, right: true, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Right" + "Left", chunksize, left: true, down: false, right: true, up: true);
+           MapHelper.SaveRoom("Room" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Down" + "Left", chunksize, left: true, down: true, right: false, up: true);
+           MapHelper.SaveRoom("Room" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: false);
+           MapHelper.SaveRoom("Room" + "Up" + "Right" + "Down" + "Left", chunksize, left: true, down: true, right: true, up: true);
+
+
+
+           MapHelper.LoadRooms(_world);
+
+            */
+
+            MapHelper.SaveRoom("Room" + "Down" + "Right", chunksize, left: false, down: true, right: true, up: false);
             #endregion
-            //MapHelper.SaveMap("OverMap");
+            //MapHelper.SaveMap("dummy");
             MapHelper.LoadRooms(_world);
             MapHelper.LoadMap("OverMap", _world, Content, _physicsWord);
 
@@ -403,7 +443,7 @@ namespace HellowIInJam
 
 
 
-           
+
 
 
 
@@ -414,14 +454,20 @@ namespace HellowIInJam
 
         private void ResetStates()
         {
+
+            _font = Content.Load<SpriteFont>("Arial");
             ref var map = ref _world.GetEntities().With<Map>().AsSet().GetEntities()[0].Get<Map>();
 
             ref var gameConfig = ref _gameConfig.Get<GameConfig>();
             ref var camera = ref _camera.Get<Camera>();
             camera.CameraPosition = new Vector2(_graphics.GraphicsDevice.Viewport.Bounds.Width / 2 + 100, _graphics.GraphicsDevice.Viewport.Bounds.Height / 2);
 
+            var room = _world.GetEntities().With<FirstRoom>().AsSet().GetEntities()[0];
+
+            
+
             ref var player = ref _player.Get<GameObject>();
-            player.PlayerBody = _physicsWord.CreateRectangle(8, 8, 1f, new Vector2(150, 150));
+            player.PlayerBody = _physicsWord.CreateRectangle(8, 8, 1f, room.Get<Room>().Tiles[350].Get<MapTile>().Position);
             player.PlayerBody.BodyType = BodyType.Dynamic;
             player.PlayerBody.OnCollision += PlayerCollision;
             player.PlayerBody.Tag = _player;
@@ -442,7 +488,7 @@ namespace HellowIInJam
             }
                );
             var dict = InitEnemyAnimationsZombie();
-            
+
             map.Enemys = new List<Entity>();
             //0
             #region Zombie
@@ -553,6 +599,47 @@ namespace HellowIInJam
 
             #endregion
 
+            var dict3 = InitAnimationsAnubis();
+
+            //3
+            #region Anubis
+
+            Vector2 posi3 = new Vector2(-100, -100);
+            var dummy3 = _physicsWord.CreateRectangle(4, 20, 1f, posi);
+            dummy3.BodyType = BodyType.Dynamic;
+            dummy3.Mass = 100;
+
+            var _enemy3 = _world.CreateEntity();
+            _enemy3.Set<Anubis>(new Anubis() {Lives = 4 });
+            map.Enemys.Add(_enemy3);
+            _enemy3.Disable();
+            _enemy3.Set<Enemy>();
+
+            _enemy3.Set(new GameObject()
+            {
+                LayerDepth = 0,
+                PlayerBody = null,
+                SourceRect = new Rectangle(0, 0, 64, 64),
+                Offset = new Vector2(4, 12)
+            });
+
+            _enemy3.Set(new Animated()
+            {
+                Animations = dict3,
+                Sources = dict3.GetValueOrDefault(Animated.Directions.Idle.ToString() + "Down"),
+
+                MaxDelayAnimation = 10,
+            });
+
+            _enemy3.Set(new MoveAndSlide()
+            {
+                Index = r.Next(100)
+            });
+
+            _enemy3.SetSameAs<TextureShared>(test);
+
+            #endregion
+
 
 
 
@@ -562,6 +649,38 @@ namespace HellowIInJam
 
             #endregion
 
+        }
+
+        private Dictionary<String, Point[]> InitAnimationsAnubis()
+        {
+            var dict = new Dictionary<String, Point[]>();
+            List<Point> dummy = new List<Point>();
+            for (int i = 0; i < 26; i++)
+            {
+                dummy.Add(new Point(0 + i * 64, 176));
+            }
+            var sources = dummy.ToArray();
+            dict.Add(Animated.Directions.Down.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 64;
+            dict.Add(Animated.Directions.Up.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 64;
+            dict.Add(Animated.Directions.Left.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 64;
+            dict.Add(Animated.Directions.Right.ToString(), (Point[])sources.Clone());
+            for (int i = 0; i < sources.Length; i++) sources[i].Y += 64;
+
+            dict.Add(Animated.Directions.Idle.ToString() + "Down", new Point[] { new Point(0, 432) });
+            dict.Add(Animated.Directions.Idle.ToString() + "Up", new Point[] { new Point(64, 432) });
+            dict.Add(Animated.Directions.Idle.ToString() + "Left", new Point[] { new Point(128, 432) });
+            dict.Add(Animated.Directions.Idle.ToString() + "Right", new Point[] { new Point(192, 432) });
+            List<Point> dummy1 = new List<Point>();
+            for (int i = 0; i < 10; i++)
+            {
+                dummy1.Add(new Point(0 + i * 64, 496));
+            }
+
+            dict.Add("Attack", dummy1.ToArray());
+            return dict;
         }
 
         private Dictionary<String, Point[]> InitAnimationsPot()
@@ -620,7 +739,6 @@ namespace HellowIInJam
 
         private bool PlayerCollision(Fixture sender, Fixture other, Contact contact)
         {
-           
             if (sender.Body.Tag == null && other.Body.Tag == null) return true;
 
             if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Door>())
@@ -638,12 +756,20 @@ namespace HellowIInJam
             else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Enemy>())
             {
                 Entity player = (Entity)sender.Body.Tag;
+
                 if (player.Get<Player>().isAttacking) return true;
                 if (player.Get<Player>().Transformed)
                     player.Get<Player>().Color = Color.Red;
 
 
+
+                //SoundHelper.PlaySound("MonsterAngriff");
+
+
                 if (player.Has<Damage>()) return true;
+
+
+                //SoundHelper.PlaySound("Schaden");
 
                 player.Set(new Damage()
                 {
@@ -653,16 +779,17 @@ namespace HellowIInJam
             else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Pit>())
             {
                 Entity player = (Entity)sender.Body.Tag;
-                if (player.Get<Player>().isAttacking) return true;
-               
-                    player.Get<Player>().playerLives = 1;
+                if (player.Get<Player>().isAttacking) return false;
+
+                player.Get<Player>().playerLives = 1;
 
 
-               
+                if (player.Get<Player>().Transformed) SoundHelper.PlaySound("LochFallenWerWolf");
+                else SoundHelper.PlaySound("LochFallebMensch");
 
                 player.Set(new Damage()
                 {
-
+                    SoundPlayed = true
                 });
             }
             else if (other.Body.Tag != null && ((Entity)other.Body.Tag).Has<Trap>())
@@ -771,7 +898,7 @@ namespace HellowIInJam
 
 
             _spriteBatch.End();
-
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState: SS_PointBorder);
             if (_player.Get<Player>().Demonized == 3)
             {
                 /*
@@ -784,20 +911,21 @@ namespace HellowIInJam
                         timer = 0;
                     }
                 */
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState: SS_PointBorder);
+             
 
 
-
+                
                 _spriteBatch.Draw(_viniette, Vector2.Zero, new Rectangle(0, 0, _viniette.Width, _viniette.Height), Color.White, 0, Vector2.Zero, scale: scale, SpriteEffects.None, 1f);
-
-
-
-
-                _spriteBatch.End();
+            
                 //}
             }
 
+            _spriteBatch.DrawString(_font, "Steuerung: W/A/S/D", new Vector2(20, 20), Color.White);
+            _spriteBatch.DrawString(_font, "Verwandelung: F", new Vector2(20, 50), Color.White);
+            _spriteBatch.DrawString(_font, "Angreifen Wolf Form: Linke Maustaste", new Vector2(20, 80), Color.White);
+            _spriteBatch.DrawString(_font, "Objektiv: Pharao umbringen", new Vector2(20, 110), Color.White);
 
+            _spriteBatch.End();
 
 
             base.Draw(gameTime);

@@ -3,6 +3,7 @@ using DefaultEcs;
 using DefaultEcs.System;
 using HellowIInJam.Components.Objects;
 using HellowIInJam.Components.Objects.Player;
+using HellowIInJam.Helper.Main;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -26,16 +27,17 @@ namespace HellowIInJam.Systems.Main
         }
 
 
-
+  
 
 
         protected override void Update(float elaspedTime, in Entity entity)
         {
+            if (entity.Has<Anubis>() && entity.Get<Anubis>().Attacking) return; 
             ref var gameObject = ref entity.Get<GameObject>();
             ref var player = ref _player.Get<GameObject>();
             ref var followPlayer = ref entity.Get<FollowPlayer>();
             ref var animated = ref entity.Get<Animated>();
-
+            gameObject.keinSound += elaspedTime;
             if (followPlayer.cachedposition == Vector2.Zero) {
                 Vector2 dir = player.PlayerBody.Position - gameObject.PlayerBody.Position;
                 dir.Normalize();
@@ -52,11 +54,15 @@ namespace HellowIInJam.Systems.Main
                 
                 
             }
-
+            if (gameObject.keinSound > 1000) { 
+                //SoundHelper.PlaySound("MonsterNormal");
+                gameObject.keinSound = 0;
+            }
             if (followPlayer.Direction.X > 0.5f)
             {
                 if (animated.Direction != Animated.Directions.Right)
                 {
+                   
                     animated.Direction = Animated.Directions.Right;
                     animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Right.ToString());
                 }
@@ -65,6 +71,7 @@ namespace HellowIInJam.Systems.Main
             {
                 if (animated.Direction != Animated.Directions.Left)
                 {
+                    
                     animated.Direction = Animated.Directions.Left;
                     animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Left.ToString());
                 }
@@ -73,6 +80,7 @@ namespace HellowIInJam.Systems.Main
             {
                 if (animated.Direction != Animated.Directions.Down)
                 {
+                    
                     animated.Direction = Animated.Directions.Down;
                     animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Down.ToString());
                 }
@@ -81,6 +89,7 @@ namespace HellowIInJam.Systems.Main
             {
                 if (animated.Direction != Animated.Directions.Up)
                 {
+                   
                     animated.Direction = Animated.Directions.Up;
                     animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Up.ToString());
                 }
