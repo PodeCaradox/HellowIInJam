@@ -15,6 +15,7 @@ namespace HellowIInJam.Components.Map
         public List<Entity> Enemys;
         public int[] Enemys1;
         public bool Open;
+        public bool Visited;
 
         public List<Entity> Pots;
     }

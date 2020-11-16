@@ -136,7 +136,7 @@ namespace HellowIInJam.Systems.Main
                     }
                     else
                     {
-                       
+                        force = new Vector2(0, player.Speed * 5);
                         CheckAnimation(Animated.Directions.AttackDown, ref animated, player.Transformed, player.Demonized, true);
                     }
 
@@ -181,7 +181,7 @@ namespace HellowIInJam.Systems.Main
                 {
                     if (animated.Direction == Animated.Directions.AttackDown)
                     {
-                        force *= new Vector2(0, player.Speed * 10);
+                        force = new Vector2(0, player.Speed * 10);
                     }
                     else if (animated.Direction == Animated.Directions.AttackTop)
                     {
@@ -228,17 +228,22 @@ namespace HellowIInJam.Systems.Main
             }
 
             #region Timer
-            if (player.Transformed && player.Demonized != 3) player.werwolfTimer += elaspedTime;
+            if (player.Transformed && player.Demonized < 3) player.werwolfTimer += elaspedTime;
             // 4 sekunden
             if (player.werwolfTimer > 5000)
             {
+
                 player.werwolfTimer = 0;
-                if (player.Demonized < 3) player.Demonized++;
-                if (!player.Transformed)
-                    if (player.Demonized == 2) player.Invertiert = true;
+                if (player.Demonized < 3) { 
+                    player.Demonized++;
+                    ref var sound = ref _sound.Get<Sound>();
+                    SoundHelper.ChangeBackgroundMusic("Monster Mode " + player.Demonized);
+                
+                }
+
+                if (player.Demonized == 2) player.Invertiert = true;
                
-                ref var sound = ref _sound.Get<Sound>();
-                SoundHelper.ChangeBackgroundMusic("Monster Mode " + player.Demonized);
+              
             }
             #endregion
 
@@ -246,10 +251,10 @@ namespace HellowIInJam.Systems.Main
 
             player.Direction = force;
             gameObject.PlayerBody.ApplyForce(force);
-            if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F))
+            if (keyboard.IsKeyDown(Keys.F) && keyboardStateBefore.IsKeyUp(Keys.F) && player.Demonized < 3)
             {
-                
-                if ( !player.isAttacking) {
+               
+                    if ( !player.isAttacking) {
                     player.Transformed = !player.Transformed;
 
                     if (player.Transformed) SoundHelper.PlaySound("Verwandlung");
@@ -284,9 +289,11 @@ namespace HellowIInJam.Systems.Main
 
             gameObject.LayerDepth = PosTransformer.ScreenToDepth(gameObject.PlayerBody.Position);
             var chunk = PosTransformer.ScreenToChunkKKey(gameObject.PlayerBody.Position);
-            if(player.ChunkBefore != chunk)
+            if (player.ChunkBefore != chunk) {
                 ChunkHelper.ActivateLight(player.ChunkBefore, chunk);
                 player.ChunkBefore = chunk;
+            }
+            
 
            
             keyboardStateBefore = keyboard;

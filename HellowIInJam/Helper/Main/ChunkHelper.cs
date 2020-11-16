@@ -50,8 +50,9 @@ namespace HellowIInJam.Helper.Main
             }
 
 
-            if (!mapData.Chunks[after].Get<Room>().Open)
+            if (!mapData.Chunks[after].Get<Room>().Open && !mapData.Chunks[after].Get<Room>().Visited)
             {
+                mapData.Chunks[after].Get<Room>().Visited = true;
                 for (int i = 0; i < mapData.Chunks[after].Get<Room>().Doors.Count; i++)
                 {
                     mapData.Chunks[after].Get<Room>().Doors[i].Get<Door>().Opnened = false;

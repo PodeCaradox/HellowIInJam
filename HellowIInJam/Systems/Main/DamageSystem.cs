@@ -41,10 +41,12 @@ namespace HellowIInJam.Systems.Main
                 if (animated.EndReached)
                 {
                     animated.Sources = animated.Animations.GetValueOrDefault(Animated.Directions.Down.ToString());
+                    SoundHelper.ChangeBackgroundMusic("BgLoop");
                     entity.Remove<Damage>();
                     entity.Get<GameObject>().PlayerBody.BodyType = tainicom.Aether.Physics2D.Dynamics.BodyType.Dynamic;
                     entity.Get<Player>().Color = Color.White;
                     entity.Get<Player>().Demonized = 0;
+                    entity.Get<GameObject>().SourceRect.Width = 16;
                     entity.Get<Player>().Invertiert = false;
                     entity.Get<Player>().Transformed = false;
                     entity.Get<Player>().werwolfTimer = 0;
@@ -63,7 +65,7 @@ namespace HellowIInJam.Systems.Main
                     if (player.Transformed) SoundHelper.PlaySound("PlayerDeath(Wolf)");
                     else SoundHelper.PlaySound("PlayerDeath(Mensch)");
                 }
-                
+                entity.Get<GameObject>().SourceRect.Width = 16;
                 entity.Get<GameObject>().PlayerBody.BodyType = tainicom.Aether.Physics2D.Dynamics.BodyType.Static;
                 player.Color = Color.White;
                 animated.ActualAnimationIndex = 0;

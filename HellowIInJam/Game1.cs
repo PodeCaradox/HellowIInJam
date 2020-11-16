@@ -23,7 +23,6 @@ using System.IO;
 using System.Threading;
 using HellowIInJam.Components.Sound;
 using System.Collections.Generic;
-using SharpMath2;
 using HellowIInJam.Helper.Main;
 using tainicom.Aether.Physics2D.Dynamics;
 using World = DefaultEcs.World;
@@ -41,6 +40,7 @@ namespace HellowIInJam
         private RenderTarget2D light;
         private Effect LightEffect;
         private float scale;
+        private Texture2D _wolfBar;
         #region Entitys
 
         private Entity _camera;
@@ -178,10 +178,7 @@ namespace HellowIInJam
 
             });
 
-            _player.Set(new Collision()
-            {
-                CollisionRect = ShapeUtils.CreateRectangle(16, 16)
-            });
+       
 
 
 
@@ -423,7 +420,7 @@ namespace HellowIInJam
             //MapHelper.SaveMap("dummy");
             MapHelper.LoadRooms(_world);
             MapHelper.LoadMap("OverMap", _world, Content, _physicsWord);
-
+            _wolfBar = Content.Load<Texture2D>("Wolfbar");
 
 
 
@@ -787,6 +784,8 @@ namespace HellowIInJam
                 if (player.Get<Player>().Transformed) SoundHelper.PlaySound("LochFallenWerWolf");
                 else SoundHelper.PlaySound("LochFallebMensch");
 
+          
+
                 player.Set(new Damage()
                 {
                     SoundPlayed = true
@@ -796,7 +795,9 @@ namespace HellowIInJam
             {
                 Entity player = (Entity)sender.Body.Tag;
                 Entity trap = (Entity)other.Body.Tag;
+                
                 if (!trap.Get<Trap>().Activ) return false;
+                
                 player.Set(new Damage()
                 {
 
@@ -808,6 +809,7 @@ namespace HellowIInJam
                 Entity pot = (Entity)other.Body.Tag;
                 _physicsWord.RemoveAsync(other.Body);
                 pot.Disable();
+                player.Get<Player>().werwolfTimer = 0;
                 player.Get<Player>().Demonized = 0;
             }
             return true;
@@ -919,11 +921,28 @@ namespace HellowIInJam
             
                 //}
             }
+            //_player.Get<GameObject>().PlayerBody.Position 
+            _spriteBatch.DrawString(_font, "Status 1: All Normal", new Vector2(200, 220), Color.White);
+            _spriteBatch.DrawString(_font, "Status 2: You cant see so good", new Vector2(200, 240), Color.White);
+            _spriteBatch.DrawString(_font, "Status 3: Invertet Movement in Wolf Form", new Vector2(200, 260), Color.White);
+            _spriteBatch.DrawString(_font, "Status 4: You cant transform back, only with a flask", new Vector2(200, 280), Color.White);
 
-            _spriteBatch.DrawString(_font, "Steuerung: W/A/S/D", new Vector2(20, 20), Color.White);
-            _spriteBatch.DrawString(_font, "Verwandelung: F", new Vector2(20, 50), Color.White);
-            _spriteBatch.DrawString(_font, "Angreifen Wolf Form: Linke Maustaste", new Vector2(20, 80), Color.White);
-            _spriteBatch.DrawString(_font, "Objektiv: Pharao umbringen", new Vector2(20, 110), Color.White);
+
+            _spriteBatch.DrawString(_font, "Transformation Status: " + (_player.Get<Player>().Demonized + 1), new Vector2(200, 300), Color.White);
+            if(_player.Get<Player>().Demonized == 0)
+                _spriteBatch.Draw(_wolfBar, new Vector2(200, 320), new Rectangle(0, 0, (int)(25f / 5000 * _player.Get<Player>().werwolfTimer), _wolfBar.Height), Color.White);
+
+            else if (_player.Get<Player>().Demonized == 1)
+            _spriteBatch.Draw(_wolfBar,new Vector2(200,320), new Rectangle(0, 0, (int)(25 + 34f / 5000 * _player.Get<Player>().werwolfTimer), _wolfBar.Height), Color.White);
+           else if (_player.Get<Player>().Demonized == 2)
+                _spriteBatch.Draw(_wolfBar, new Vector2(200, 320), new Rectangle(0, 0, (int)(59 + 21f / 5000 * _player.Get<Player>().werwolfTimer), _wolfBar.Height), Color.White);
+            else if (_player.Get<Player>().Demonized == 3)
+                _spriteBatch.Draw(_wolfBar, new Vector2(200, 320),  Color.White);
+
+            _spriteBatch.DrawString(_font, "Movement: W/A/S/D", new Vector2(20, 20), Color.White);
+            _spriteBatch.DrawString(_font, "Transform: F", new Vector2(20, 50), Color.White);
+            _spriteBatch.DrawString(_font, "Attackin(Wolf only): Left Mouse", new Vector2(20, 80), Color.White);
+            _spriteBatch.DrawString(_font, "Objectiv: kill Anubis", new Vector2(20, 110), Color.White);
 
             _spriteBatch.End();
 
